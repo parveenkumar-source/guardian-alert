@@ -1,5 +1,7 @@
+import { useState, useEffect } from "react";
 import { CheckCircle, MapPin, Share2 } from "lucide-react";
-import { getContacts, generateSOSMessage } from "@/lib/contacts";
+import { generateSOSMessage } from "@/lib/contacts";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SOSConfirmedProps {
   location: { latitude: number; longitude: number } | null;
@@ -7,7 +9,14 @@ interface SOSConfirmedProps {
 }
 
 const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
-  const contacts = getContacts();
+  const [contactCount, setContactCount] = useState(0);
+
+  useEffect(() => {
+    supabase.from("emergency_contacts").select("id", { count: "exact", head: true }).then(({ count }) => {
+      setContactCount(count || 0);
+    });
+  }, []);
+
   const message = location
     ? generateSOSMessage(location.latitude, location.longitude)
     : "🚨 EMERGENCY SOS ALERT! I need immediate help!";
@@ -32,7 +41,7 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
         <div className="space-y-2">
           <h2 className="font-display text-2xl font-bold text-foreground">SOS Alert Sent!</h2>
           <p className="text-muted-foreground text-sm">
-            Emergency alerts have been prepared for {contacts.length} contact{contacts.length !== 1 ? "s" : ""}.
+            Emergency alerts have been prepared for {contactCount} contact{contactCount !== 1 ? "s" : ""}.
           </p>
         </div>
 
