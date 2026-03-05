@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { CheckCircle, MapPin, Share2 } from "lucide-react";
+import { CheckCircle, MapPin, Share2, Loader2 } from "lucide-react";
 import { generateSOSMessage } from "@/lib/contacts";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface SOSConfirmedProps {
   location: { latitude: number; longitude: number } | null;
@@ -10,6 +11,13 @@ interface SOSConfirmedProps {
 
 const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
   const [contactCount, setContactCount] = useState(0);
+  const [smsSent, setSmsSent] = useState(false);
+  const [smsSending, setSmsSending] = useState(false);
+  const { toast } = useToast();
+
+  const message = location
+    ? generateSOSMessage(location.latitude, location.longitude)
+    : "🚨 EMERGENCY SOS ALERT! I need immediate help!";
 
   useEffect(() => {
     supabase.from("emergency_contacts").select("id", { count: "exact", head: true }).then(({ count }) => {
@@ -17,9 +25,34 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
     });
   }, []);
 
-  const message = location
-    ? generateSOSMessage(location.latitude, location.longitude)
-    : "🚨 EMERGENCY SOS ALERT! I need immediate help!";
+  // Auto-send SMS on mount
+  useEffect(() => {
+    const sendSMS = async () => {
+      setSmsSending(true);
+      try {
+        const { data, error } = await supabase.functions.invoke("send-sms", {
+          body: { message },
+        });
+        if (error) throw error;
+        setSmsSent(true);
+        const successCount = data?.results?.filter((r: any) => r.success).length || 0;
+        toast({
+          title: "SMS Alerts Sent!",
+          description: `${successCount} emergency contact${successCount !== 1 ? "s" : ""} notified via SMS.`,
+        });
+      } catch (err: any) {
+        console.error("SMS send error:", err);
+        toast({
+          title: "SMS Failed",
+          description: err.message || "Could not send SMS alerts. Use Share to notify contacts manually.",
+          variant: "destructive",
+        });
+      } finally {
+        setSmsSending(false);
+      }
+    };
+    sendSMS();
+  }, []);
 
   const handleShare = async () => {
     if (navigator.share) {
