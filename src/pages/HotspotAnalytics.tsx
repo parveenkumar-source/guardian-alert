@@ -220,9 +220,9 @@ const HotspotAnalytics = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Time</SelectItem>
-                <SelectItem value="7d">7 Din</SelectItem>
-                <SelectItem value="30d">30 Din</SelectItem>
-                <SelectItem value="90d">90 Din</SelectItem>
+                <SelectItem value="7d">7 Days</SelectItem>
+                <SelectItem value="30d">30 Days</SelectItem>
+                <SelectItem value="90d">90 Days</SelectItem>
               </SelectContent>
             </Select>
             <Button onClick={generatePDF} disabled={generatingPdf || reports.length === 0} size="sm" className="gap-1.5 text-xs">
