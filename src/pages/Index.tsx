@@ -205,6 +205,32 @@ const Index = () => {
               <PhoneIncoming className="w-3.5 h-3.5" />
               Fake Call
             </button>
+            {settings.safe_word && (
+              <button
+                onClick={async () => {
+                  if (!user) {
+                    toast({ title: "Please sign in first", variant: "destructive" });
+                    return;
+                  }
+                  try {
+                    const { data, error } = await supabase.functions.invoke("send-sms", {
+                      body: { message: settings.safe_word },
+                    });
+                    toast({
+                      title: error ? "Failed to send" : "Safe word sent",
+                      description: error ? "Could not send safe word." : "Your code phrase was sent to all emergency contacts.",
+                      variant: error ? "destructive" : "default",
+                    });
+                  } catch {
+                    toast({ title: "Failed to send", variant: "destructive" });
+                  }
+                }}
+                className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium bg-secondary text-muted-foreground border border-border hover:text-foreground transition-all"
+              >
+                <KeyRound className="w-3.5 h-3.5" />
+                Safe Word
+              </button>
+            )}
           </div>
 
 

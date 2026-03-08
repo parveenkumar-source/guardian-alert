@@ -75,6 +75,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
           fake_call_delay: data.fake_call_delay ?? 5,
           triple_tap_sos: data.triple_tap_sos ?? true,
           proximity_alert: data.proximity_alert ?? false,
+          safe_word: data.safe_word ?? "",
         });
       }
       setLoading(false);
