@@ -48,6 +48,7 @@ const App = () => (
               <Route path="/activity" element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="/evidence" element={<ProtectedRoute><Evidence /></ProtectedRoute>} />
+              <Route path="/community" element={<ProtectedRoute><CommunityFeed /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
