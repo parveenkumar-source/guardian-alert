@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useToast } from "@/hooks/use-toast";
+import ReportComments from "@/components/ReportComments";
 import {
   MapPin, AlertTriangle, Shield, Eye, Flame, Moon, Car, Users,
   ThumbsUp, ThumbsDown, Loader2, Filter, Navigation,
