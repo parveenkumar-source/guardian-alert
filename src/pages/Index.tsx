@@ -153,6 +153,14 @@ const Index = () => {
       pulse: false,
       disabled: fakeCallActive,
     },
+    {
+      icon: Calculator,
+      label: "Disguise",
+      onClick: () => setDisguiseActive(true),
+      active: false,
+      activeClass: "",
+      pulse: false,
+    },
     ...(settings.safe_word
       ? [{
           icon: KeyRound,
