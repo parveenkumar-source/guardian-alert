@@ -105,6 +105,18 @@ const hi = {
   helplines_immediate_danger: "तत्काल खतरे",
   helplines_call: "में हैं, तो कृपया कॉल करें",
   helplines_right_away: "तुरंत।",
+  helpline_women: "महिला हेल्पलाइन (अखिल भारतीय)",
+  helpline_women_desc: "24/7 संकट में महिलाओं के लिए",
+  helpline_police: "पुलिस आपातकालीन",
+  helpline_police_desc: "राष्ट्रीय आपातकालीन नंबर",
+  helpline_ncw: "महिला आयोग",
+  helpline_ncw_desc: "NCW WhatsApp हेल्पलाइन",
+  helpline_domestic: "घरेलू हिंसा",
+  helpline_domestic_desc: "घरेलू दुर्व्यवहार पीड़ितों के लिए",
+  helpline_child: "चाइल्ड हेल्पलाइन",
+  helpline_child_desc: "देखभाल की ज़रूरत वाले बच्चों के लिए",
+  helpline_cyber: "साइबर अपराध",
+  helpline_cyber_desc: "ऑनलाइन उत्पीड़न और धोखाधड़ी रिपोर्ट करें",
 
   // Safety Map
   map_title: "कम्युनिटी सेफ्टी मैप",

@@ -111,10 +111,35 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Inter', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Grotesk', sans-serif;
+  }
+
+  /* Better touch targets */
+  button, a, [role="button"] {
+    min-height: 36px;
+  }
+
+  /* Prevent text selection on interactive elements */
+  button, [role="button"] {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Better focus styles */
+  :focus-visible {
+    @apply outline-2 outline-primary/50 outline-offset-2;
+  }
+
+  /* Form elements consistent sizing */
+  input, textarea, select {
+    @apply text-base sm:text-sm;
+    font-size: 16px; /* Prevents iOS zoom */
   }
 }
 
