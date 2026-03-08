@@ -241,6 +241,42 @@ export type Database = {
         }
         Relationships: []
       }
+      safety_reports: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          latitude: number
+          longitude: number
+          severity: string
+          upvotes: number
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          latitude: number
+          longitude: number
+          severity?: string
+          upvotes?: number
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          latitude?: number
+          longitude?: number
+          severity?: string
+          upvotes?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_settings: {
         Row: {
           countdown_seconds: number
