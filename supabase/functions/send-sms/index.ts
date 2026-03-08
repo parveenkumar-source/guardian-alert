@@ -12,14 +12,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
-    const TWILIO_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN");
-    const TWILIO_PHONE_NUMBER = Deno.env.get("TWILIO_PHONE_NUMBER");
-
-    if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_PHONE_NUMBER) {
-      throw new Error("Twilio credentials are not configured");
-    }
-
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       throw new Error("Missing authorization header");
@@ -27,9 +19,6 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
-    }
     const supabase = createClient(supabaseUrl, supabaseKey, {
       global: { headers: { Authorization: authHeader } },
     });
@@ -58,33 +47,25 @@ Deno.serve(async (req) => {
       throw new Error("No emergency contacts found");
     }
 
-    // Send SMS to each contact via Twilio
-    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
-    const authString = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
-
+    // Send SMS to each contact via TextBelt (free, no API key needed)
     const results = await Promise.allSettled(
       contacts.map(async (contact) => {
-        const body = new URLSearchParams({
-          To: contact.phone,
-          From: TWILIO_PHONE_NUMBER,
-          Body: message,
-        });
-
-        const res = await fetch(twilioUrl, {
+        const res = await fetch("https://textbelt.com/text", {
           method: "POST",
-          headers: {
-            Authorization: `Basic ${authString}`,
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: body.toString(),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            phone: contact.phone,
+            message: message,
+            key: "textbelt",
+          }),
         });
 
         const data = await res.json();
-        if (!res.ok) {
+        if (!data.success) {
           console.error(`Failed to send SMS to ${contact.phone}:`, data);
-          return { contact: contact.name, success: false, error: data.message };
+          return { contact: contact.name, success: false, error: data.error || data.message };
         }
-        return { contact: contact.name, success: true, sid: data.sid };
+        return { contact: contact.name, success: true, textId: data.textId };
       })
     );
 
