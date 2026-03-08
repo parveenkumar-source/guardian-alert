@@ -37,6 +37,7 @@ const Index = () => {
   const { user } = useAuth();
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoRecording = useAutoRecording();
+  useBatteryAlert();
 
   const canTrigger = useCallback(async () => {
     if (sosState !== "idle") return false;
