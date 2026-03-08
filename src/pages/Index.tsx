@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { Shield, MapPin, Users, Bell, ChevronRight, Phone } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { generateSOSMessage } from "@/lib/contacts";
@@ -9,6 +9,7 @@ import SafetyTips from "@/components/SafetyTips";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import useShakeDetection from "@/hooks/useShakeDetection";
 
 const Index = () => {
   const [sosState, setSosState] = useState<"idle" | "activating" | "confirmed">("idle");
