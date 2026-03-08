@@ -13,6 +13,7 @@ export interface UserSettings {
   fake_call_delay: number;
   triple_tap_sos: boolean;
   proximity_alert: boolean;
+  safe_word: string;
 }
 
 const defaults: UserSettings = {
