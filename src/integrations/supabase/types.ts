@@ -140,6 +140,39 @@ export type Database = {
         }
         Relationships: []
       }
+      safety_checkins: {
+        Row: {
+          alert_sent: boolean
+          created_at: string
+          expires_at: string
+          id: string
+          is_active: boolean
+          latitude: number | null
+          longitude: number | null
+          user_id: string
+        }
+        Insert: {
+          alert_sent?: boolean
+          created_at?: string
+          expires_at: string
+          id?: string
+          is_active?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          user_id: string
+        }
+        Update: {
+          alert_sent?: boolean
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_active?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_settings: {
         Row: {
           countdown_seconds: number
