@@ -93,17 +93,21 @@ const ReportComments = ({ reportId, isOpen, onToggle, commentCount }: ReportComm
 
     const displayName = profile?.display_name || user.email?.split("@")[0] || "Anonymous";
 
-    const { error } = await supabase.from("report_comments").insert({
+    const { data: inserted, error } = await supabase.from("report_comments").insert({
       report_id: reportId,
       user_id: user.id,
       display_name: displayName,
       content: trimmed,
-    });
+    }).select().single();
 
     if (error) {
       toast({ title: "Error", description: "Failed to post comment.", variant: "destructive" });
     } else {
       setNewComment("");
+      // Optimistically add to local state in case realtime doesn't fire
+      if (inserted) {
+        setComments((prev) => prev.some((c) => c.id === inserted.id) ? prev : [...prev, inserted]);
+      }
     }
     setSubmitting(false);
   };
