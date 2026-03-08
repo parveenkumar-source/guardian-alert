@@ -61,16 +61,16 @@ const Index = () => {
     }
   };
 
-  // Shake detection
+  // Shake detection — respects settings
   useShakeDetection({
     threshold: 25,
     debounceMs: 5000,
-    onShake: () => handleSOSTrigger("shake"),
+    onShake: settings.shake_detection ? () => handleSOSTrigger("shake") : () => {},
   });
 
-  // Voice detection
+  // Voice detection — respects settings
   const { listening, supported: voiceSupported } = useVoiceDetection({
-    enabled: voiceEnabled,
+    enabled: settings.voice_detection,
     onDistressDetected: () => handleSOSTrigger("voice"),
     debounceMs: 5000,
   });
