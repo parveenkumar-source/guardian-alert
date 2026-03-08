@@ -54,6 +54,8 @@ const CommunityFeed = () => {
   const [userVotes, setUserVotes] = useState<Record<string, number>>({});
   const [voteCounts, setVoteCounts] = useState<Record<string, { up: number; down: number }>>({});
   const [votingId, setVotingId] = useState<string | null>(null);
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
+  const [openCommentId, setOpenCommentId] = useState<string | null>(null);
 
   useEffect(() => {
     getLocation();
