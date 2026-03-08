@@ -198,6 +198,7 @@ const Index = () => {
       {fakeCallActive && (
         <FakeCall callerName={settings.fake_call_name || "Mom"} delay={settings.fake_call_delay || 5} onEnd={() => setFakeCallActive(false)} key="fake-call" />
       )}
+      {disguiseActive && <DisguiseMode onExit={() => setDisguiseActive(false)} />}
 
       {/* Hero SOS Section */}
       <section className="relative min-h-[calc(100vh-8rem)] flex flex-col items-center justify-center px-4 overflow-hidden">
