@@ -55,13 +55,26 @@ const EmergencyInfoCard = () => {
     if (!user) return;
     setSaving(true);
 
-    const payload = { ...form, user_id: user.id } as any;
+    const payload = { ...form, user_id: user.id };
+    let error;
 
-    const { error } = await supabase
-      .from("emergency_info" as any)
-      .upsert(payload, { onConflict: "user_id" } as any);
+    if (info) {
+      // Update existing record
+      const result = await supabase
+        .from("emergency_info")
+        .update(payload)
+        .eq("user_id", user.id);
+      error = result.error;
+    } else {
+      // Insert new record
+      const result = await supabase
+        .from("emergency_info")
+        .insert(payload);
+      error = result.error;
+    }
 
     if (error) {
+      console.error("Emergency info save error:", error);
       toast({ title: "Failed to save", variant: "destructive" });
     } else {
       queryClient.invalidateQueries({ queryKey: ["emergency-info"] });
