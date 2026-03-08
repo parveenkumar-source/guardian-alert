@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Shield, Users, Home, Phone, LogIn, LogOut, Navigation, FileText, Settings, MapPin, Camera, MessageSquare, Menu, X, AlertTriangle } from "lucide-react";
+import { Shield, Users, Home, Phone, LogIn, LogOut, Navigation, FileText, Settings, MapPin, Camera, MessageSquare, Menu, X, AlertTriangle, Bot, ShieldAlert, FileCheck } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import LanguageToggle from "@/components/LanguageToggle";
@@ -21,6 +21,9 @@ const Navbar = () => {
   ];
 
   const secondaryLinks = [
+    { to: "/ai-chat", label: t("nav_chatbot"), icon: Bot },
+    { to: "/incident-report", label: t("nav_incident"), icon: FileCheck },
+    { to: "/threat-assessment", label: t("nav_threat"), icon: ShieldAlert },
     { to: "/helplines", label: t("nav_helplines"), icon: Phone },
     { to: "/hotspots", label: t("nav_hotspots"), icon: AlertTriangle },
     { to: "/activity", label: t("nav_log"), icon: FileText },
