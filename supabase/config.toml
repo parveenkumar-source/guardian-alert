@@ -1,1 +1,4 @@
 project_id = "vesarikimppomvxzfxxe"
+
+[functions.safety-tips]
+verify_jwt = false
