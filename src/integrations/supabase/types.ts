@@ -89,6 +89,48 @@ export type Database = {
         }
         Relationships: []
       }
+      emergency_info: {
+        Row: {
+          allergies: string | null
+          blood_type: string | null
+          created_at: string
+          date_of_birth: string | null
+          emergency_notes: string | null
+          full_name: string | null
+          id: string
+          medical_conditions: string | null
+          medications: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          allergies?: string | null
+          blood_type?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          emergency_notes?: string | null
+          full_name?: string | null
+          id?: string
+          medical_conditions?: string | null
+          medications?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          allergies?: string | null
+          blood_type?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          emergency_notes?: string | null
+          full_name?: string | null
+          id?: string
+          medical_conditions?: string | null
+          medications?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       evidence_recordings: {
         Row: {
           created_at: string
@@ -310,6 +352,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      safe_zones: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          latitude: number
+          longitude: number
+          name: string
+          radius_meters: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          latitude: number
+          longitude: number
+          name?: string
+          radius_meters?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          latitude?: number
+          longitude?: number
+          name?: string
+          radius_meters?: number
+          user_id?: string
+        }
+        Relationships: []
       }
       safety_checkins: {
         Row: {
