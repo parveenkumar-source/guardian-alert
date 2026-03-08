@@ -198,6 +198,11 @@ const Index = () => {
           <div className="w-full max-w-xs">
             <SafetyCheckin />
           </div>
+
+          {/* Journey Tracking */}
+          <div className="w-full max-w-xs">
+            <JourneyTracker />
+          </div>
         </div>
       </section>
 
