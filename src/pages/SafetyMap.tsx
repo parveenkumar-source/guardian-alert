@@ -365,6 +365,59 @@ const SafetyMap = () => {
           </div>
         </Card>
 
+        {/* Danger Zones */}
+        {dangerZones.length > 0 && (
+          <Card className="border-destructive/40 bg-destructive/5">
+            <CardHeader className="p-3 pb-1">
+              <CardTitle className="text-sm flex items-center gap-2 text-destructive">
+                <TriangleAlert className="w-4 h-4" />
+                Danger Zones — Khatarnak Ilake
+                <Link to="/hotspots" className="ml-auto text-[10px] font-normal text-primary hover:underline">
+                  View Full Report →
+                </Link>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-3 pt-1 space-y-2">
+              {dangerZones.map((zone, i) => {
+                const maxCount = dangerZones[0]?.count || 1;
+                return (
+                  <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-background/60 border border-destructive/20">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                      zone.maxSeverity === "high" ? "bg-destructive/30 text-destructive" : "bg-orange-500/30 text-orange-400"
+                    }`}>
+                      <TriangleAlert className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <a
+                          href={`https://maps.google.com/?q=${zone.lat},${zone.lng}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-medium text-primary hover:underline truncate"
+                        >
+                          📍 {zone.lat.toFixed(4)}, {zone.lng.toFixed(4)}
+                        </a>
+                        <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${
+                          zone.maxSeverity === "high" ? "bg-destructive/20 text-destructive" : "bg-orange-500/20 text-orange-400"
+                        }`}>
+                          {zone.count} reports
+                        </span>
+                      </div>
+                      <Progress value={(zone.count / maxCount) * 100} className="h-1 mt-1" />
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {Array.from(zone.categories).slice(0, 3).map(cat => (
+                          <span key={cat} className="text-[9px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">
+                            {getCategoryInfo(cat).label}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+        )}
         {/* Reports list */}
         <div className="space-y-3">
           <h2 className="text-lg font-semibold text-foreground">
