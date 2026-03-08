@@ -83,7 +83,7 @@ const Index = () => {
         description: 'Say "Help", "Bachao", or "SOS" to trigger an alert.',
       });
     }
-    // Update via settings context - requires importing updateSettings
+    await updateSettings({ voice_detection: newVal });
   };
 
   const handleSOSConfirm = () => setSosState("confirmed");
