@@ -234,7 +234,7 @@ const SafetyMap = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pt-20 pb-8 px-4">
+    <div className="min-h-screen bg-background pt-16 pb-24 md:pb-8 px-4 page-transition">
       <div className="container mx-auto max-w-4xl space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

@@ -80,14 +80,14 @@ const ContactsPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-20 flex items-center justify-center">
+      <div className="min-h-screen pt-16 pb-24 md:pb-12 flex items-center justify-center">
         <p className="text-muted-foreground">Loading contacts...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-12 px-4">
+    <div className="min-h-screen pt-16 pb-24 md:pb-12 px-4 page-transition">
       <div className="container mx-auto max-w-lg">
         <div className="flex items-center justify-between mb-8">
           <div>

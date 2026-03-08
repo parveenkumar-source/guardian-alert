@@ -129,7 +129,7 @@ const Evidence = () => {
     });
 
   return (
-    <div className="min-h-screen pt-20 pb-12 px-4">
+    <div className="min-h-screen pt-16 pb-24 md:pb-12 px-4 page-transition">
       <div className="container mx-auto max-w-lg">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">

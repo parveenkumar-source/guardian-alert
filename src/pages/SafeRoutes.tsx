@@ -60,7 +60,7 @@ const SafeRoutes = () => {
     ));
 
   return (
-    <div className="min-h-screen pt-20 pb-12 px-4">
+    <div className="min-h-screen pt-16 pb-24 md:pb-12 px-4 page-transition">
       <div className="container mx-auto max-w-lg">
         <div className="mb-8">
           <h1 className="font-display text-2xl font-bold text-foreground">Safe Routes</h1>
