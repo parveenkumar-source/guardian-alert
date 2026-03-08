@@ -16,6 +16,7 @@ import SafetyMap from "./pages/SafetyMap";
 import ActivityLog from "./pages/ActivityLog";
 import SettingsPage from "./pages/Settings";
 import Evidence from "./pages/Evidence";
+import CommunityFeed from "./pages/CommunityFeed";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/activity" element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="/evidence" element={<ProtectedRoute><Evidence /></ProtectedRoute>} />
+              <Route path="/community" element={<ProtectedRoute><CommunityFeed /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
