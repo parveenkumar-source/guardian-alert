@@ -19,15 +19,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    let isMounted = true;
 
+    // First restore session from storage
     supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (!isMounted) return;
       if (error) {
-        // Clear invalid/expired session gracefully
         console.warn("Session recovery failed, signing out:", error.message);
         supabase.auth.signOut();
         setSession(null);
@@ -39,7 +36,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    // Then listen for subsequent auth changes (sign in/out)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) return;
+      setSession(session);
+      setUser(session?.user ?? null);
+      // Don't set loading here - getSession handles initial load
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signUp = async (email: string, password: string, displayName?: string) => {
