@@ -7,6 +7,7 @@ import SOSActivation from "@/components/SOSActivation";
 import SOSConfirmed from "@/components/SOSConfirmed";
 import SafetyTips from "@/components/SafetyTips";
 import PanicMode from "@/components/PanicMode";
+import SafetyCheckin from "@/components/SafetyCheckin";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -190,6 +191,11 @@ const Index = () => {
               <Phone className="w-5 h-5 text-safe" />
               <span className="text-xs font-medium text-foreground">Helplines</span>
             </Link>
+          </div>
+
+          {/* Safety Check-in */}
+          <div className="w-full max-w-xs">
+            <SafetyCheckin />
           </div>
         </div>
       </section>
