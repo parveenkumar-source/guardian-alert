@@ -2,11 +2,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { SettingsProvider } from "@/hooks/useSettings";
 import { ThemeProvider } from "@/hooks/useTheme";
+import { AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
+import PageTransition from "@/components/PageTransition";
 import Index from "./pages/Index";
 import Contacts from "./pages/Contacts";
 import Helplines from "./pages/Helplines";
@@ -28,6 +30,28 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+        <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
+        <Route path="/contacts" element={<PageTransition><ProtectedRoute><Contacts /></ProtectedRoute></PageTransition>} />
+        <Route path="/helplines" element={<PageTransition><Helplines /></PageTransition>} />
+        <Route path="/safe-routes" element={<PageTransition><ProtectedRoute><SafeRoutes /></ProtectedRoute></PageTransition>} />
+        <Route path="/safety-map" element={<PageTransition><ProtectedRoute><SafetyMap /></ProtectedRoute></PageTransition>} />
+        <Route path="/activity" element={<PageTransition><ProtectedRoute><ActivityLog /></ProtectedRoute></PageTransition>} />
+        <Route path="/settings" element={<PageTransition><ProtectedRoute><SettingsPage /></ProtectedRoute></PageTransition>} />
+        <Route path="/evidence" element={<PageTransition><ProtectedRoute><Evidence /></ProtectedRoute></PageTransition>} />
+        <Route path="/community" element={<PageTransition><ProtectedRoute><CommunityFeed /></ProtectedRoute></PageTransition>} />
+        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -38,19 +62,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Navbar />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
-              <Route path="/helplines" element={<Helplines />} />
-              <Route path="/safe-routes" element={<ProtectedRoute><SafeRoutes /></ProtectedRoute>} />
-              <Route path="/safety-map" element={<ProtectedRoute><SafetyMap /></ProtectedRoute>} />
-              <Route path="/activity" element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
-              <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-              <Route path="/evidence" element={<ProtectedRoute><Evidence /></ProtectedRoute>} />
-              <Route path="/community" element={<ProtectedRoute><CommunityFeed /></ProtectedRoute>} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <AnimatedRoutes />
           </BrowserRouter>
         </SettingsProvider>
       </AuthProvider>
