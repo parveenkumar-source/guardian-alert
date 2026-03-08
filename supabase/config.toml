@@ -5,3 +5,12 @@ verify_jwt = false
 
 [functions.safe-routes]
 verify_jwt = false
+
+[functions.ai-chatbot]
+verify_jwt = false
+
+[functions.incident-report]
+verify_jwt = false
+
+[functions.threat-assessment]
+verify_jwt = false

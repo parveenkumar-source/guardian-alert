@@ -21,6 +21,9 @@ const Navbar = () => {
   ];
 
   const secondaryLinks = [
+    { to: "/ai-chat", label: t("nav_chatbot"), icon: Bot },
+    { to: "/incident-report", label: t("nav_incident"), icon: FileCheck },
+    { to: "/threat-assessment", label: t("nav_threat"), icon: ShieldAlert },
     { to: "/helplines", label: t("nav_helplines"), icon: Phone },
     { to: "/hotspots", label: t("nav_hotspots"), icon: AlertTriangle },
     { to: "/activity", label: t("nav_log"), icon: FileText },

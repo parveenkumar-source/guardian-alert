@@ -52,6 +52,9 @@ const AnimatedRoutes = () => {
         <Route path="/evidence" element={<PageTransition><ProtectedRoute><Evidence /></ProtectedRoute></PageTransition>} />
         <Route path="/community" element={<PageTransition><ProtectedRoute><CommunityFeed /></ProtectedRoute></PageTransition>} />
         <Route path="/hotspots" element={<PageTransition><ProtectedRoute><HotspotAnalytics /></ProtectedRoute></PageTransition>} />
+        <Route path="/ai-chat" element={<PageTransition><AIChatbot /></PageTransition>} />
+        <Route path="/incident-report" element={<PageTransition><IncidentReport /></PageTransition>} />
+        <Route path="/threat-assessment" element={<PageTransition><ThreatAssessment /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
