@@ -210,7 +210,7 @@ const HotspotAnalytics = () => {
               Hotspot Analytics
             </h1>
             <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-              Sabse khatarnak areas ki puri jaankari — Police ke liye report banao
+              Detailed insights on the most dangerous areas — Generate reports for police
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
