@@ -57,6 +57,7 @@ const AnimatedRoutes = () => {
         <Route path="/ai-chat" element={<PageTransition><AIChatbot /></PageTransition>} />
         <Route path="/incident-report" element={<PageTransition><IncidentReport /></PageTransition>} />
         <Route path="/threat-assessment" element={<PageTransition><ThreatAssessment /></PageTransition>} />
+        <Route path="/self-defense" element={<PageTransition><SelfDefense /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
