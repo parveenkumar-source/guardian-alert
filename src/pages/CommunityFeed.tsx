@@ -112,7 +112,9 @@ const CommunityFeed = () => {
           setReports((prev) => prev.filter((r) => r.id !== (payload.old as any).id));
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("[CommunityFeed] Realtime status:", status);
+      });
 
     return () => {
       supabase.removeChannel(channel);
