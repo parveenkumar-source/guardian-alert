@@ -40,8 +40,9 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
       });
   }, []);
 
-  // Auto-send SMS on mount
+  // Auto-send SMS on mount (if enabled)
   useEffect(() => {
+    if (!settings.notify_sms) return;
     const sendSMS = async () => {
       setSmsSending(true);
       try {
