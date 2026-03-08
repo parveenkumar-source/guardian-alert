@@ -11,6 +11,7 @@ import SafetyCheckin from "@/components/SafetyCheckin";
 import JourneyTracker from "@/components/JourneyTracker";
 import FakeCall from "@/components/FakeCall";
 import useTripleTap from "@/hooks/useTripleTap";
+import useProximityAlert from "@/hooks/useProximityAlert";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -85,6 +86,9 @@ const Index = () => {
     onTripleTap: () => handleSOSTrigger("stealth"),
     enabled: sosState === "idle" && settings.triple_tap_sos,
   });
+
+  // Proximity-based auto-alert for unsafe areas
+  useProximityAlert();
 
   const toggleVoice = async () => {
     const newVal = !settings.voice_detection;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Settings, Clock, MessageSquare, Bell, Vibrate, Mic, Save, Check, BellRing, PhoneIncoming, Hand } from "lucide-react";
+import { Settings, Clock, MessageSquare, Bell, Vibrate, Mic, Save, Check, BellRing, PhoneIncoming, Hand, Radar } from "lucide-react";
 import { useSettings } from "@/hooks/useSettings";
 import { useToast } from "@/hooks/use-toast";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -237,6 +237,13 @@ const SettingsPage = () => {
               description="Tap screen 3 times quickly to trigger SOS"
               checked={local.triple_tap_sos}
               onChange={(v) => handleChange("triple_tap_sos", v)}
+            />
+            <ToggleRow
+              icon={<Radar className="w-4 h-4" />}
+              label="Proximity Alert"
+              description="Auto-notify contacts when near an unsafe area"
+              checked={local.proximity_alert}
+              onChange={(v) => handleChange("proximity_alert", v)}
             />
           </section>
 
