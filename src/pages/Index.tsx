@@ -36,11 +36,12 @@ const Index = () => {
     return true;
   }, [sosState, user, toast]);
 
-  const handleSOSTrigger = useCallback(async () => {
+  const handleSOSTrigger = useCallback(async (trigger: TriggerType = "manual") => {
     if (!(await canTrigger())) return;
     getLocation();
     setSosState("activating");
-  }, [canTrigger, getLocation]);
+    logSOSTrigger(trigger, location);
+  }, [canTrigger, getLocation, location]);
 
   // Long press SOS button → panic mode
   const handleSOSPointerDown = () => {
