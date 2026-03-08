@@ -204,6 +204,7 @@ const CommunityFeed = () => {
 
   const filtered = reports
     .filter((r) => {
+      if (selectedCategories.size > 0 && !selectedCategories.has(r.category)) return false;
       if (!location) return true;
       return haversine(location.latitude, location.longitude, r.latitude, r.longitude) <= radiusKm;
     })
