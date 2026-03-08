@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useSettings } from "@/hooks/useSettings";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 
 interface SafetyReport {
   id: string;
@@ -32,19 +33,28 @@ const useProximityAlert = () => {
   const { user } = useAuth();
   const { settings } = useSettings();
   const { toast } = useToast();
-  const alertedRef = useRef<Map<string, number>>(new Map()); // reportId → timestamp
+  const alertedRef = useRef<Map<string, number>>(new Map());
   const watchIdRef = useRef<number | null>(null);
   const reportsRef = useRef<SafetyReport[]>([]);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Fetch reports periodically
-  const fetchReports = useCallback(async () => {
-    const { data } = await supabase
-      .from("safety_reports")
-      .select("id, latitude, longitude, category, severity")
-      .in("severity", ["medium", "high"]);
-    if (data) reportsRef.current = data;
-  }, []);
+  // Fetch reports with React Query caching (refetch every 60s)
+  const { data: reportsData } = useQuery({
+    queryKey: ["safety-reports-proximity"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("safety_reports")
+        .select("id, latitude, longitude, category, severity")
+        .in("severity", ["medium", "high"]);
+      return data ?? [];
+    },
+    enabled: !!user && settings.proximity_alert,
+    staleTime: 60 * 1000,
+    refetchInterval: 60 * 1000,
+  });
+
+  useEffect(() => {
+    if (reportsData) reportsRef.current = reportsData;
+  }, [reportsData]);
 
   // Notify contacts via SMS edge function
   const notifyContacts = useCallback(
@@ -114,21 +124,12 @@ const useProximityAlert = () => {
   useEffect(() => {
     const enabled = user && settings.proximity_alert && navigator.geolocation;
     if (!enabled) {
-      // Clean up
       if (watchIdRef.current !== null) {
         navigator.geolocation.clearWatch(watchIdRef.current);
         watchIdRef.current = null;
       }
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
       return;
     }
-
-    // Fetch reports now and periodically
-    fetchReports();
-    intervalRef.current = setInterval(fetchReports, 60_000);
 
     // Watch position
     watchIdRef.current = navigator.geolocation.watchPosition(checkProximity, undefined, {
@@ -141,12 +142,8 @@ const useProximityAlert = () => {
         navigator.geolocation.clearWatch(watchIdRef.current);
         watchIdRef.current = null;
       }
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
     };
-  }, [user, settings.proximity_alert, fetchReports, checkProximity]);
+  }, [user, settings.proximity_alert, checkProximity]);
 };
 
 export default useProximityAlert;
