@@ -197,16 +197,6 @@ const Index = () => {
             </button>
           </div>
 
-          {/* Fake Call Widget */}
-          {fakeCallActive && (
-            <div className="w-full max-w-xs">
-              <FakeCall
-                callerName="Mom"
-                delay={fakeCallDelay}
-                onEnd={() => setFakeCallActive(false)}
-              />
-            </div>
-          )}
 
           <div className="flex gap-3 w-full max-w-xs">
             <Link to="/contacts" className="flex-1 glass-card-hover p-3 flex flex-col items-center gap-1.5 text-center">
