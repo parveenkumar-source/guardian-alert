@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, AlertTriangle, Plus, X, Shield, Eye, Flame, Moon, Car, Users, ThumbsUp, ThumbsDown } from "lucide-react";
+import { MapPin, AlertTriangle, Plus, X, Shield, Eye, Flame, Moon, Car, Users, ThumbsUp, ThumbsDown, TriangleAlert } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Link } from "react-router-dom";
 
 interface SafetyReport {
   id: string;
