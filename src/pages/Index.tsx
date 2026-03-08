@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { Shield, MapPin, Users, Bell, ChevronRight, Phone } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { generateSOSMessage } from "@/lib/contacts";
@@ -9,6 +9,7 @@ import SafetyTips from "@/components/SafetyTips";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import useShakeDetection from "@/hooks/useShakeDetection";
 
 const Index = () => {
   const [sosState, setSosState] = useState<"idle" | "activating" | "confirmed">("idle");
@@ -16,7 +17,8 @@ const Index = () => {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  const handleSOSTrigger = async () => {
+  const handleSOSTrigger = useCallback(async () => {
+    if (sosState !== "idle") return;
     if (!user) {
       toast({ title: "Please sign in first", description: "You need to be logged in to use SOS.", variant: "destructive" });
       return;
@@ -28,7 +30,14 @@ const Index = () => {
     }
     getLocation();
     setSosState("activating");
-  };
+  }, [sosState, user, toast, getLocation]);
+
+  // Shake detection — triggers SOS when phone is shaken vigorously
+  useShakeDetection({
+    threshold: 25,
+    debounceMs: 5000,
+    onShake: handleSOSTrigger,
+  });
 
   const handleSOSConfirm = () => setSosState("confirmed");
   const handleSOSCancel = () => setSosState("idle");
