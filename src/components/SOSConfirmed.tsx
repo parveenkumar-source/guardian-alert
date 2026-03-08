@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
-import { CheckCircle, MapPin, Share2, Loader2 } from "lucide-react";
+import { CheckCircle, MapPin, Share2, MessageCircle, Send } from "lucide-react";
 import { generateSOSMessage } from "@/lib/contacts";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+
+interface Contact {
+  name: string;
+  phone: string;
+}
 
 interface SOSConfirmedProps {
   location: { latitude: number; longitude: number } | null;
@@ -10,9 +15,10 @@ interface SOSConfirmedProps {
 }
 
 const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
-  const [contactCount, setContactCount] = useState(0);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [smsSent, setSmsSent] = useState(false);
   const [smsSending, setSmsSending] = useState(false);
+  const [whatsappSentTo, setWhatsappSentTo] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
   const message = location
@@ -20,9 +26,12 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
     : "🚨 EMERGENCY SOS ALERT! I need immediate help!";
 
   useEffect(() => {
-    supabase.from("emergency_contacts").select("id", { count: "exact", head: true }).then(({ count }) => {
-      setContactCount(count || 0);
-    });
+    supabase
+      .from("emergency_contacts")
+      .select("name, phone")
+      .then(({ data }) => {
+        setContacts(data || []);
+      });
   }, []);
 
   // Auto-send SMS on mount
@@ -43,8 +52,8 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
       } catch (err: any) {
         console.error("SMS send error:", err);
         toast({
-          title: "SMS Failed",
-          description: err.message || "Could not send SMS alerts. Use Share to notify contacts manually.",
+          title: "SMS delivery issue",
+          description: "Use WhatsApp below to alert your contacts instantly.",
           variant: "destructive",
         });
       } finally {
@@ -54,6 +63,20 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
     sendSMS();
   }, []);
 
+  const openWhatsApp = (contact: Contact) => {
+    // Strip non-digit characters except leading +
+    const phone = contact.phone.replace(/[^\d]/g, "");
+    const encoded = encodeURIComponent(message);
+    window.open(`https://wa.me/${phone}?text=${encoded}`, "_blank");
+    setWhatsappSentTo((prev) => new Set(prev).add(contact.phone));
+  };
+
+  const sendAllWhatsApp = () => {
+    contacts.forEach((contact, i) => {
+      setTimeout(() => openWhatsApp(contact), i * 600);
+    });
+  };
+
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -61,12 +84,13 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
       } catch {}
     } else {
       navigator.clipboard.writeText(message);
+      toast({ title: "Message copied to clipboard" });
     }
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-xl">
-      <div className="flex flex-col items-center gap-6 p-8 max-w-sm w-full text-center">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-xl overflow-y-auto">
+      <div className="flex flex-col items-center gap-5 p-6 max-w-sm w-full text-center my-8">
         <div className="w-20 h-20 rounded-full bg-safe/20 flex items-center justify-center">
           <CheckCircle className="w-10 h-10 text-safe" />
         </div>
@@ -74,7 +98,7 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
         <div className="space-y-2">
           <h2 className="font-display text-2xl font-bold text-foreground">SOS Alert Sent!</h2>
           <p className="text-muted-foreground text-sm">
-            Emergency alerts have been prepared for {contactCount} contact{contactCount !== 1 ? "s" : ""}.
+            Emergency alerts prepared for {contacts.length} contact{contacts.length !== 1 ? "s" : ""}.
           </p>
         </div>
 
@@ -101,6 +125,43 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
           <p className="text-xs text-muted-foreground mb-2 font-medium">Alert Message:</p>
           <p className="text-xs text-foreground/80 whitespace-pre-line">{message}</p>
         </div>
+
+        {/* WhatsApp Alert Section */}
+        {contacts.length > 0 && (
+          <div className="w-full space-y-3">
+            <button
+              onClick={sendAllWhatsApp}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-[#25D366] text-white font-medium text-sm transition-all hover:bg-[#1ebe57] active:scale-[0.98]"
+            >
+              <MessageCircle className="w-4 h-4" />
+              Alert All via WhatsApp
+            </button>
+
+            <div className="space-y-2">
+              {contacts.map((contact) => (
+                <button
+                  key={contact.phone}
+                  onClick={() => openWhatsApp(contact)}
+                  className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg bg-secondary/80 hover:bg-secondary transition-colors text-sm"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-[#25D366]/15 flex items-center justify-center">
+                      <span className="text-xs font-semibold text-[#25D366]">
+                        {contact.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <span className="text-foreground font-medium">{contact.name}</span>
+                  </div>
+                  {whatsappSentTo.has(contact.phone) ? (
+                    <span className="text-xs text-safe">Opened ✓</span>
+                  ) : (
+                    <Send className="w-3.5 h-3.5 text-muted-foreground" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="flex gap-3 w-full">
           <button
