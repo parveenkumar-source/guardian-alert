@@ -105,6 +105,18 @@ const en = {
   helplines_immediate_danger: "immediate danger",
   helplines_call: "please call",
   helplines_right_away: "right away.",
+  helpline_women: "Women Helpline (All India)",
+  helpline_women_desc: "24/7 women in distress helpline",
+  helpline_police: "Police Emergency",
+  helpline_police_desc: "National emergency number",
+  helpline_ncw: "Women Commission",
+  helpline_ncw_desc: "NCW WhatsApp helpline",
+  helpline_domestic: "Domestic Violence",
+  helpline_domestic_desc: "Support for domestic abuse victims",
+  helpline_child: "Child Helpline",
+  helpline_child_desc: "For children in need of care",
+  helpline_cyber: "Cyber Crime",
+  helpline_cyber_desc: "Report online harassment & fraud",
 
   // Safety Map
   map_title: "Community Safety Map",
