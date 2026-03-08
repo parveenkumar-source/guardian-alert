@@ -4,6 +4,7 @@ import { generateSOSMessage } from "@/lib/contacts";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/hooks/useSettings";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 interface Contact {
   name: string;
