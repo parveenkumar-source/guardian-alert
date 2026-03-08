@@ -3,6 +3,7 @@ import { Navigation, MapPin, Share2, Square, Loader2, Copy, Check } from "lucide
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const TRACK_INTERVAL_MS = 15000; // 15 seconds
 
