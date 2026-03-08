@@ -13,6 +13,7 @@ export interface UserSettings {
   fake_call_delay: number;
   triple_tap_sos: boolean;
   proximity_alert: boolean;
+  safe_word: string;
 }
 
 const defaults: UserSettings = {
@@ -26,6 +27,7 @@ const defaults: UserSettings = {
   fake_call_delay: 5,
   triple_tap_sos: true,
   proximity_alert: false,
+  safe_word: "",
 };
 
 interface SettingsContextType {
@@ -73,6 +75,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
           fake_call_delay: data.fake_call_delay ?? 5,
           triple_tap_sos: data.triple_tap_sos ?? true,
           proximity_alert: data.proximity_alert ?? false,
+          safe_word: data.safe_word ?? "",
         });
       }
       setLoading(false);

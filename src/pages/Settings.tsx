@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Settings, Clock, MessageSquare, Bell, Vibrate, Mic, Save, Check, BellRing, PhoneIncoming, Hand, Radar, Sun, Moon } from "lucide-react";
+import { Settings, Clock, MessageSquare, Bell, Vibrate, Mic, Save, Check, BellRing, PhoneIncoming, Hand, Radar, Sun, Moon, KeyRound } from "lucide-react";
 import { useSettings } from "@/hooks/useSettings";
 import { useToast } from "@/hooks/use-toast";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -242,6 +242,25 @@ const SettingsPage = () => {
                 </div>
               </div>
             </div>
+          </section>
+
+          {/* Safe Word */}
+          <section className="glass-card p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <KeyRound className="w-4 h-4 text-primary" />
+              <h2 className="font-display font-semibold text-foreground">Safe Word</h2>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Set a discreet code phrase. When sent via SMS to your trusted contacts, it signals you're in danger without alerting anyone nearby.
+            </p>
+            <input
+              value={local.safe_word}
+              onChange={(e) => handleChange("safe_word", e.target.value.slice(0, 50))}
+              placeholder='e.g. "Buy milk" or "Red umbrella"'
+              maxLength={50}
+              className="w-full rounded-lg bg-secondary/50 border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+            />
+            <p className="text-xs text-muted-foreground text-right">{local.safe_word.length}/50</p>
           </section>
 
           {/* Detection Preferences */}

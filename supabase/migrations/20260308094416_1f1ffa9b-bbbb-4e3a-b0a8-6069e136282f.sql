@@ -1,0 +1,1 @@
+ALTER TABLE public.user_settings ADD COLUMN safe_word text DEFAULT '' NULL;
