@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, AlertTriangle, Plus, X, Shield, Eye, Flame, Moon, Car, Users } from "lucide-react";
+import { MapPin, AlertTriangle, Plus, X, Shield, Eye, Flame, Moon, Car, Users, ThumbsUp, ThumbsDown } from "lucide-react";
 
 interface SafetyReport {
   id: string;
@@ -19,6 +19,11 @@ interface SafetyReport {
   severity: string;
   created_at: string;
   upvotes: number;
+}
+
+interface VoteRecord {
+  report_id: string;
+  vote_type: number;
 }
 
 const CATEGORIES = [
@@ -51,6 +56,9 @@ const SafetyMap = () => {
   const [severity, setSeverity] = useState("medium");
   const [description, setDescription] = useState("");
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
+  const [userVotes, setUserVotes] = useState<Record<string, number>>({});
+  const [voteCounts, setVoteCounts] = useState<Record<string, { up: number; down: number }>>({});
+  const [votingId, setVotingId] = useState<string | null>(null);
 
   const fetchReports = useCallback(async () => {
     const { data } = await supabase
@@ -61,9 +69,43 @@ const SafetyMap = () => {
     if (data) setReports(data);
   }, []);
 
+  const fetchVotes = useCallback(async (reportIds: string[]) => {
+    if (reportIds.length === 0) return;
+
+    // Fetch all votes for these reports
+    const { data: allVotes } = await supabase
+      .from("report_votes")
+      .select("report_id, vote_type, user_id")
+      .in("report_id", reportIds);
+
+    if (allVotes) {
+      const counts: Record<string, { up: number; down: number }> = {};
+      const myVotes: Record<string, number> = {};
+
+      for (const vote of allVotes) {
+        if (!counts[vote.report_id]) counts[vote.report_id] = { up: 0, down: 0 };
+        if (vote.vote_type === 1) counts[vote.report_id].up++;
+        else counts[vote.report_id].down++;
+
+        if (user && vote.user_id === user.id) {
+          myVotes[vote.report_id] = vote.vote_type;
+        }
+      }
+
+      setVoteCounts(counts);
+      setUserVotes(myVotes);
+    }
+  }, [user]);
+
   useEffect(() => {
     fetchReports();
   }, [fetchReports]);
+
+  useEffect(() => {
+    if (reports.length > 0) {
+      fetchVotes(reports.map((r) => r.id));
+    }
+  }, [reports, fetchVotes]);
 
   useEffect(() => {
     if (location && !mapCenter) {
@@ -74,6 +116,75 @@ const SafetyMap = () => {
   useEffect(() => {
     getLocation();
   }, [getLocation]);
+
+  const handleVote = async (reportId: string, voteType: number) => {
+    if (!user) {
+      toast({ title: "Sign in required", description: "Please sign in to vote.", variant: "destructive" });
+      return;
+    }
+
+    setVotingId(reportId);
+    const currentVote = userVotes[reportId];
+
+    try {
+      if (currentVote === voteType) {
+        // Remove vote (toggle off)
+        await supabase
+          .from("report_votes")
+          .delete()
+          .eq("report_id", reportId)
+          .eq("user_id", user.id);
+
+        setUserVotes((prev) => {
+          const next = { ...prev };
+          delete next[reportId];
+          return next;
+        });
+        setVoteCounts((prev) => ({
+          ...prev,
+          [reportId]: {
+            up: (prev[reportId]?.up || 0) - (voteType === 1 ? 1 : 0),
+            down: (prev[reportId]?.down || 0) - (voteType === -1 ? 1 : 0),
+          },
+        }));
+      } else if (currentVote !== undefined) {
+        // Change vote
+        await supabase
+          .from("report_votes")
+          .update({ vote_type: voteType })
+          .eq("report_id", reportId)
+          .eq("user_id", user.id);
+
+        setUserVotes((prev) => ({ ...prev, [reportId]: voteType }));
+        setVoteCounts((prev) => ({
+          ...prev,
+          [reportId]: {
+            up: (prev[reportId]?.up || 0) + (voteType === 1 ? 1 : -1),
+            down: (prev[reportId]?.down || 0) + (voteType === -1 ? 1 : -1),
+          },
+        }));
+      } else {
+        // New vote
+        await supabase.from("report_votes").insert({
+          report_id: reportId,
+          user_id: user.id,
+          vote_type: voteType,
+        });
+
+        setUserVotes((prev) => ({ ...prev, [reportId]: voteType }));
+        setVoteCounts((prev) => ({
+          ...prev,
+          [reportId]: {
+            up: (prev[reportId]?.up || 0) + (voteType === 1 ? 1 : 0),
+            down: (prev[reportId]?.down || 0) + (voteType === -1 ? 1 : 0),
+          },
+        }));
+      }
+    } catch {
+      toast({ title: "Error", description: "Failed to register vote.", variant: "destructive" });
+    }
+    setVotingId(null);
+  };
 
   const handleSubmit = async () => {
     if (!user) {
@@ -114,6 +225,12 @@ const SafetyMap = () => {
     if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
     if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
     return `${Math.floor(seconds / 86400)}d ago`;
+  };
+
+  const getNetScore = (reportId: string) => {
+    const counts = voteCounts[reportId];
+    if (!counts) return 0;
+    return counts.up - counts.down;
   };
 
   return (
@@ -237,10 +354,46 @@ const SafetyMap = () => {
               {reports.map((report) => {
                 const catInfo = getCategoryInfo(report.category);
                 const Icon = catInfo.icon;
+                const myVote = userVotes[report.id];
+                const netScore = getNetScore(report.id);
+                const isVoting = votingId === report.id;
                 return (
                   <Card key={report.id} className="hover:border-primary/30 transition-colors">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
+                        {/* Vote column */}
+                        <div className="flex flex-col items-center gap-0.5 shrink-0">
+                          <button
+                            onClick={() => handleVote(report.id, 1)}
+                            disabled={isVoting}
+                            className={`p-1.5 rounded-md transition-colors ${
+                              myVote === 1
+                                ? "bg-primary/20 text-primary"
+                                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                            }`}
+                            aria-label="Upvote"
+                          >
+                            <ThumbsUp className="w-4 h-4" />
+                          </button>
+                          <span className={`text-xs font-bold tabular-nums ${
+                            netScore > 0 ? "text-primary" : netScore < 0 ? "text-destructive" : "text-muted-foreground"
+                          }`}>
+                            {netScore}
+                          </span>
+                          <button
+                            onClick={() => handleVote(report.id, -1)}
+                            disabled={isVoting}
+                            className={`p-1.5 rounded-md transition-colors ${
+                              myVote === -1
+                                ? "bg-destructive/20 text-destructive"
+                                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                            }`}
+                            aria-label="Downvote"
+                          >
+                            <ThumbsDown className="w-4 h-4" />
+                          </button>
+                        </div>
+
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${SEVERITY_COLORS[report.severity] || "bg-muted"}`}>
                           <Icon className="w-5 h-5 text-primary-foreground" />
                         </div>
