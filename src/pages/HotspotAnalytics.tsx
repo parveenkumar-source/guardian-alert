@@ -341,7 +341,7 @@ const HotspotAnalytics = () => {
                             rel="noopener noreferrer"
                             className="text-xs font-medium text-primary hover:underline"
                           >
-                            📍 {h.lat.toFixed(4)}, {h.lng.toFixed(4)}
+                            📍 {getName(h.lat, h.lng) || `${h.lat.toFixed(4)}, ${h.lng.toFixed(4)}`}
                           </a>
                           <div className="flex flex-wrap gap-1 mt-1">
                             {Object.entries(h.severities).map(([s]) => getSeverityBadge(s))}
