@@ -10,6 +10,7 @@ const countdownOptions = [3, 5, 7, 10, 15, 20];
 const SettingsPage = () => {
   const { settings, loading, updateSettings } = useSettings();
   const { toast } = useToast();
+  const { theme, toggleTheme } = useTheme();
   const push = usePushNotifications();
   const [local, setLocal] = useState(settings);
   const [saving, setSaving] = useState(false);
