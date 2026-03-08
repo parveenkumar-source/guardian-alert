@@ -236,6 +236,31 @@ const SafetyMap = () => {
     return counts.up - counts.down;
   };
 
+  // Compute hotspot danger zones from reports
+  const dangerZones = useMemo(() => {
+    const gridSize = 200; // ~0.5km grid
+    const map = new Map<string, { lat: number; lng: number; count: number; categories: Set<string>; maxSeverity: string }>();
+    const sevOrder: Record<string, number> = { low: 0, medium: 1, high: 2, critical: 3 };
+
+    for (const r of reports) {
+      const key = `${(Math.round(r.latitude * gridSize) / gridSize).toFixed(3)},${(Math.round(r.longitude * gridSize) / gridSize).toFixed(3)}`;
+      if (!map.has(key)) {
+        map.set(key, { lat: r.latitude, lng: r.longitude, count: 0, categories: new Set(), maxSeverity: "low" });
+      }
+      const z = map.get(key)!;
+      z.count++;
+      z.categories.add(r.category);
+      if ((sevOrder[r.severity] || 0) > (sevOrder[z.maxSeverity] || 0)) {
+        z.maxSeverity = r.severity;
+      }
+    }
+
+    return Array.from(map.values())
+      .filter(z => z.count >= 2 || z.maxSeverity === "high")
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  }, [reports]);
+
   return (
     <div className="min-h-screen bg-background pt-16 pb-24 md:pb-8 px-4 page-transition">
       <div className="container mx-auto max-w-4xl space-y-6">
