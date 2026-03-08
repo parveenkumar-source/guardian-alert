@@ -1,0 +1,1 @@
+ALTER TABLE public.safety_reports REPLICA IDENTITY FULL;
