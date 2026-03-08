@@ -27,10 +27,10 @@ const EmergencyInfoCard = () => {
     queryKey: ["emergency-info", user?.id],
     queryFn: async () => {
       const { data } = await supabase
-        .from("emergency_info" as any)
+        .from("emergency_info")
         .select("*")
         .eq("user_id", user!.id)
-        .maybeSingle() as any;
+        .maybeSingle();
       return data ?? null;
     },
     enabled: !!user,
@@ -55,13 +55,35 @@ const EmergencyInfoCard = () => {
     if (!user) return;
     setSaving(true);
 
-    const payload = { ...form, user_id: user.id } as any;
+    const payload = {
+      full_name: form.full_name || null,
+      blood_type: form.blood_type || null,
+      allergies: form.allergies || null,
+      medical_conditions: form.medical_conditions || null,
+      medications: form.medications || null,
+      emergency_notes: form.emergency_notes || null,
+      date_of_birth: form.date_of_birth || null,
+      user_id: user.id,
+    };
+    let error;
 
-    const { error } = await supabase
-      .from("emergency_info" as any)
-      .upsert(payload, { onConflict: "user_id" } as any);
+    if (info) {
+      // Update existing record
+      const result = await supabase
+        .from("emergency_info")
+        .update(payload)
+        .eq("user_id", user.id);
+      error = result.error;
+    } else {
+      // Insert new record
+      const result = await supabase
+        .from("emergency_info")
+        .insert(payload);
+      error = result.error;
+    }
 
     if (error) {
+      console.error("Emergency info save error:", error);
       toast({ title: "Failed to save", variant: "destructive" });
     } else {
       queryClient.invalidateQueries({ queryKey: ["emergency-info"] });
