@@ -24,6 +24,8 @@ import HotspotAnalytics from "./pages/HotspotAnalytics";
 import AIChatbot from "./pages/AIChatbot";
 import IncidentReport from "./pages/IncidentReport";
 import ThreatAssessment from "./pages/ThreatAssessment";
+import SelfDefense from "./pages/SelfDefense";
+import FloatingSOSWidget from "./components/FloatingSOSWidget";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
