@@ -183,6 +183,9 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
           </div>
         )}
 
+        {/* Evidence Recording */}
+        <EvidenceRecorder location={location} triggerType="manual" />
+
         <div className="flex gap-3 w-full">
           <button
             onClick={handleShare}
