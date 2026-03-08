@@ -169,6 +169,7 @@ const Index = () => {
                 if (await canTrigger()) {
                   getLocation();
                   setSosState("panic");
+                  logSOSTrigger("stealth", location);
                 }
               }}
               className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium bg-secondary text-muted-foreground border border-border hover:text-foreground transition-all"
