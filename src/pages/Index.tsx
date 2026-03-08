@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Shield, MapPin, Users, Bell, ChevronRight, Phone } from "lucide-react";
+import { Shield, MapPin, Users, Bell, ChevronRight, Phone, Mic, MicOff } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { generateSOSMessage } from "@/lib/contacts";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,9 +10,11 @@ import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import useShakeDetection from "@/hooks/useShakeDetection";
+import useVoiceDetection from "@/hooks/useVoiceDetection";
 
 const Index = () => {
   const [sosState, setSosState] = useState<"idle" | "activating" | "confirmed">("idle");
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
   const { location, getLocation } = useGeolocation();
   const { toast } = useToast();
   const { user } = useAuth();
