@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
-import { Settings, Clock, MessageSquare, Bell, Vibrate, Mic, Save, Check, BellRing, PhoneIncoming, Hand, Radar } from "lucide-react";
+import { Settings, Clock, MessageSquare, Bell, Vibrate, Mic, Save, Check, BellRing, PhoneIncoming, Hand, Radar, Sun, Moon } from "lucide-react";
 import { useSettings } from "@/hooks/useSettings";
 import { useToast } from "@/hooks/use-toast";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useTheme } from "@/hooks/useTheme";
 
 const countdownOptions = [3, 5, 7, 10, 15, 20];
 
 const SettingsPage = () => {
   const { settings, loading, updateSettings } = useSettings();
   const { toast } = useToast();
+  const { theme, toggleTheme } = useTheme();
   const push = usePushNotifications();
   const [local, setLocal] = useState(settings);
   const [saving, setSaving] = useState(false);
@@ -58,6 +60,37 @@ const SettingsPage = () => {
         </div>
 
         <div className="space-y-6">
+          {/* Appearance */}
+          <section className="glass-card p-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <Sun className="w-4 h-4 text-primary" />
+              <h2 className="font-display font-semibold text-foreground">Appearance</h2>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="text-muted-foreground">
+                  {theme === "dark" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">{theme === "dark" ? "Dark Mode" : "Light Mode"}</p>
+                  <p className="text-xs text-muted-foreground">Switch between dark and light themes</p>
+                </div>
+              </div>
+              <button
+                onClick={toggleTheme}
+                className={`relative w-11 h-6 rounded-full transition-colors ${
+                  theme === "light" ? "bg-primary" : "bg-secondary"
+                }`}
+              >
+                <div
+                  className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
+                    theme === "light" ? "translate-x-[22px]" : "translate-x-0.5"
+                  }`}
+                />
+              </button>
+            </div>
+          </section>
+
           {/* Custom Alert Message */}
           <section className="glass-card p-5 space-y-3">
             <div className="flex items-center gap-2">
