@@ -10,6 +10,7 @@ import PanicMode from "@/components/PanicMode";
 import SafetyCheckin from "@/components/SafetyCheckin";
 import JourneyTracker from "@/components/JourneyTracker";
 import FakeCall from "@/components/FakeCall";
+import useTripleTap from "@/hooks/useTripleTap";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -77,6 +78,12 @@ const Index = () => {
     enabled: settings.voice_detection,
     onDistressDetected: () => handleSOSTrigger("voice"),
     debounceMs: 5000,
+  });
+
+  // Triple-tap discreet SOS trigger
+  useTripleTap({
+    onTripleTap: () => handleSOSTrigger("stealth"),
+    enabled: sosState === "idle",
   });
 
   const toggleVoice = async () => {
