@@ -238,6 +238,13 @@ const SettingsPage = () => {
               checked={local.triple_tap_sos}
               onChange={(v) => handleChange("triple_tap_sos", v)}
             />
+            <ToggleRow
+              icon={<Radar className="w-4 h-4" />}
+              label="Proximity Alert"
+              description="Auto-notify contacts when near an unsafe area"
+              checked={local.proximity_alert}
+              onChange={(v) => handleChange("proximity_alert", v)}
+            />
           </section>
 
           {/* Save Button */}
