@@ -400,7 +400,7 @@ const SafetyMap = () => {
                           rel="noopener noreferrer"
                           className="text-xs font-medium text-primary hover:underline truncate"
                         >
-                          📍 {zone.lat.toFixed(4)}, {zone.lng.toFixed(4)}
+                          📍 {getName(zone.lat, zone.lng) || `${zone.lat.toFixed(4)}, ${zone.lng.toFixed(4)}`}
                         </a>
                         <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${
                           zone.maxSeverity === "high" ? "bg-destructive/20 text-destructive" : "bg-orange-500/20 text-orange-400"
