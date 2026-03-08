@@ -27,6 +27,7 @@ const defaults: UserSettings = {
   fake_call_delay: 5,
   triple_tap_sos: true,
   proximity_alert: false,
+  safe_word: "",
 };
 
 interface SettingsContextType {
