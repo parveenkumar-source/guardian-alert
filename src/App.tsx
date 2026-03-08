@@ -15,6 +15,7 @@ import SafeRoutes from "./pages/SafeRoutes";
 import SafetyMap from "./pages/SafetyMap";
 import ActivityLog from "./pages/ActivityLog";
 import SettingsPage from "./pages/Settings";
+import Evidence from "./pages/Evidence";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
