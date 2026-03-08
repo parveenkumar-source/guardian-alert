@@ -7,8 +7,10 @@ import { useGeolocation } from "@/hooks/useGeolocation";
 import { generateSOSMessage } from "@/lib/contacts";
 import { logSOSTrigger } from "@/lib/activityLog";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "react-router-dom";
 
 const FloatingSOSWidget = () => {
+  const routeLocation = useLocation();
   const { user } = useAuth();
   const { location, getLocation } = useGeolocation();
   const { toast } = useToast();
@@ -61,7 +63,9 @@ const FloatingSOSWidget = () => {
     window.location.href = "tel:112";
   };
 
-  if (!user) return null;
+  const isHidden = routeLocation.pathname === "/ai-chat";
+
+  if (!user || isHidden) return null;
 
   return (
     <div className="fixed bottom-24 right-4 z-50 md:bottom-6">
