@@ -49,6 +49,7 @@ const Index = () => {
       if (!(await canTrigger())) return;
       getLocation();
       setSosState("panic");
+      logSOSTrigger("stealth", location);
     }, 1500);
   };
 
