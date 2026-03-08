@@ -131,7 +131,7 @@ const Index = () => {
   return (
     <div className="min-h-screen pt-16">
       {sosState === "activating" && <SOSActivation onCancel={handleSOSCancel} onConfirm={handleSOSConfirm} countdownSeconds={settings.countdown_seconds} />}
-      {sosState === "confirmed" && <SOSConfirmed location={location} onDismiss={handleSOSDismiss} />}
+      {sosState === "confirmed" && <SOSConfirmed location={location} onDismiss={handleSOSDismiss} autoRecording={autoRecording.result} />}
       {sosState === "panic" && <PanicMode location={location} onExit={handlePanicExit} />}
       {fakeCallActive && (
         <FakeCall callerName={settings.fake_call_name || "Mom"} delay={settings.fake_call_delay || 5} onEnd={() => setFakeCallActive(false)} key="fake-call" />
