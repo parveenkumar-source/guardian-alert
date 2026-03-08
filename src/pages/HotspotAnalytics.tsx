@@ -270,8 +270,8 @@ const HotspotAnalytics = () => {
           <Card className="border-border/50">
             <CardContent className="p-8 text-center">
               <Shield className="w-12 h-12 mx-auto text-muted-foreground/50 mb-3" />
-              <p className="text-muted-foreground">Abhi tak koi report nahi aayi hai.</p>
-              <p className="text-xs text-muted-foreground mt-1">Safety Map page se reports add karein.</p>
+              <p className="text-muted-foreground">No reports have been submitted yet.</p>
+              <p className="text-xs text-muted-foreground mt-1">Add reports from the Safety Map page.</p>
             </CardContent>
           </Card>
         ) : (
