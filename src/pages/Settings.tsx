@@ -39,7 +39,7 @@ const SettingsPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-20 flex items-center justify-center text-muted-foreground">
+      <div className="min-h-screen pt-16 pb-24 md:pb-12 flex items-center justify-center text-muted-foreground">
         Loading settings...
       </div>
     );
