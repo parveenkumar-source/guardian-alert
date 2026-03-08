@@ -28,6 +28,7 @@ const Navbar = () => {
     { to: "/hotspots", label: t("nav_hotspots"), icon: AlertTriangle },
     { to: "/activity", label: t("nav_log"), icon: FileText },
     { to: "/evidence", label: t("nav_evidence"), icon: Camera },
+    { to: "/self-defense", label: "Self-Defense", icon: Swords },
     { to: "/settings", label: t("nav_settings"), icon: Settings },
   ];
 
