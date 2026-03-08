@@ -120,11 +120,11 @@
 
 @layer utilities {
   .glass-card {
-    @apply bg-card/60 backdrop-blur-xl border border-glass-border rounded-xl;
+    @apply bg-card/60 backdrop-blur-xl border border-glass-border rounded-xl shadow-lg shadow-black/5;
   }
 
   .glass-card-hover {
-    @apply glass-card transition-all duration-300 hover:bg-card/80 hover:border-primary/30;
+    @apply glass-card transition-all duration-300 hover:bg-card/80 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-0.5;
   }
 
   .text-gradient {
@@ -137,6 +137,22 @@
 
   .sos-ring {
     animation: sos-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Page transition */
+  .page-transition {
+    animation: page-enter 0.35s ease-out;
+  }
+
+  @keyframes page-enter {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   @keyframes sos-pulse {
@@ -180,4 +196,19 @@
   .animate-delay-200 { animation-delay: 0.2s; }
   .animate-delay-300 { animation-delay: 0.3s; }
   .animate-delay-400 { animation-delay: 0.4s; }
+
+  /* Improved scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
 }
