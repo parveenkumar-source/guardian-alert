@@ -10,6 +10,7 @@ import Contacts from "./pages/Contacts";
 import Helplines from "./pages/Helplines";
 import Auth from "./pages/Auth";
 import SafeRoutes from "./pages/SafeRoutes";
+import ActivityLog from "./pages/ActivityLog";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
             <Route path="/helplines" element={<Helplines />} />
             <Route path="/safe-routes" element={<ProtectedRoute><SafeRoutes /></ProtectedRoute>} />
+            <Route path="/activity" element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

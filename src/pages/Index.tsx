@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import useShakeDetection from "@/hooks/useShakeDetection";
 import useVoiceDetection from "@/hooks/useVoiceDetection";
+import { logSOSTrigger, TriggerType } from "@/lib/activityLog";
 
 const Index = () => {
   const [sosState, setSosState] = useState<"idle" | "activating" | "confirmed" | "panic">("idle");
@@ -35,11 +36,12 @@ const Index = () => {
     return true;
   }, [sosState, user, toast]);
 
-  const handleSOSTrigger = useCallback(async () => {
+  const handleSOSTrigger = useCallback(async (trigger: TriggerType = "manual") => {
     if (!(await canTrigger())) return;
     getLocation();
     setSosState("activating");
-  }, [canTrigger, getLocation]);
+    logSOSTrigger(trigger, location);
+  }, [canTrigger, getLocation, location]);
 
   // Long press SOS button → panic mode
   const handleSOSPointerDown = () => {
@@ -47,6 +49,7 @@ const Index = () => {
       if (!(await canTrigger())) return;
       getLocation();
       setSosState("panic");
+      logSOSTrigger("stealth", location);
     }, 1500);
   };
 
@@ -61,13 +64,13 @@ const Index = () => {
   useShakeDetection({
     threshold: 25,
     debounceMs: 5000,
-    onShake: handleSOSTrigger,
+    onShake: () => handleSOSTrigger("shake"),
   });
 
   // Voice detection
   const { listening, supported: voiceSupported } = useVoiceDetection({
     enabled: voiceEnabled,
-    onDistressDetected: handleSOSTrigger,
+    onDistressDetected: () => handleSOSTrigger("voice"),
     debounceMs: 5000,
   });
 
@@ -124,7 +127,7 @@ const Index = () => {
             <div className="absolute inset-0 rounded-full bg-primary/15 sos-ring" style={{ animationDelay: "0.5s" }} />
             <div className="absolute inset-0 rounded-full bg-primary/10 sos-ring" style={{ animationDelay: "1s" }} />
             <button
-              onClick={handleSOSTrigger}
+              onClick={() => handleSOSTrigger("manual")}
               onPointerDown={handleSOSPointerDown}
               onPointerUp={handleSOSPointerUp}
               onPointerLeave={handleSOSPointerUp}
@@ -166,6 +169,7 @@ const Index = () => {
                 if (await canTrigger()) {
                   getLocation();
                   setSosState("panic");
+                  logSOSTrigger("stealth", location);
                 }
               }}
               className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium bg-secondary text-muted-foreground border border-border hover:text-foreground transition-all"
