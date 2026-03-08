@@ -3,6 +3,7 @@ import { CheckCircle, MapPin, Share2, MessageCircle, Send } from "lucide-react";
 import { generateSOSMessage } from "@/lib/contacts";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useSettings } from "@/hooks/useSettings";
 
 interface Contact {
   name: string;
