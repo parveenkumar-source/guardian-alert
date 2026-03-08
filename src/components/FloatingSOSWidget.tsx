@@ -7,8 +7,12 @@ import { useGeolocation } from "@/hooks/useGeolocation";
 import { generateSOSMessage } from "@/lib/contacts";
 import { logSOSTrigger } from "@/lib/activityLog";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "react-router-dom";
 
 const FloatingSOSWidget = () => {
+  const routeLocation = useLocation();
+  if (routeLocation.pathname === "/ai-chat") return null;
+
   const { user } = useAuth();
   const { location, getLocation } = useGeolocation();
   const { toast } = useToast();
