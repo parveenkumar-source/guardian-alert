@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { X } from "lucide-react";
+import { X, Mic } from "lucide-react";
 
 interface SOSActivationProps {
   onCancel: () => void;
