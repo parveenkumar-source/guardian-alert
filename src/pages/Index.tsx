@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import { Shield, MapPin, Users, Bell, ChevronRight, Phone, Mic, MicOff, EyeOff } from "lucide-react";
+import { Shield, MapPin, Users, Bell, ChevronRight, Phone, Mic, MicOff, EyeOff, PhoneIncoming } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { generateSOSMessage } from "@/lib/contacts";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,7 @@ import SafetyTips from "@/components/SafetyTips";
 import PanicMode from "@/components/PanicMode";
 import SafetyCheckin from "@/components/SafetyCheckin";
 import JourneyTracker from "@/components/JourneyTracker";
+import FakeCall from "@/components/FakeCall";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -20,6 +21,8 @@ import { useSettings } from "@/hooks/useSettings";
 const Index = () => {
   const { settings, updateSettings } = useSettings();
   const [sosState, setSosState] = useState<"idle" | "activating" | "confirmed" | "panic">("idle");
+  const [fakeCallActive, setFakeCallActive] = useState(false);
+  const [fakeCallDelay, setFakeCallDelay] = useState(5);
   const { location, getLocation } = useGeolocation();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -181,7 +184,26 @@ const Index = () => {
               <EyeOff className="w-3.5 h-3.5" />
               Stealth
             </button>
+            <button
+              onClick={() => setFakeCallActive(true)}
+              disabled={fakeCallActive}
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium bg-secondary text-muted-foreground border border-border hover:text-foreground transition-all disabled:opacity-50"
+            >
+              <PhoneIncoming className="w-3.5 h-3.5" />
+              Fake Call
+            </button>
           </div>
+
+          {/* Fake Call Widget */}
+          {fakeCallActive && (
+            <div className="w-full max-w-xs">
+              <FakeCall
+                callerName="Mom"
+                delay={fakeCallDelay}
+                onEnd={() => setFakeCallActive(false)}
+              />
+            </div>
+          )}
 
           <div className="flex gap-3 w-full max-w-xs">
             <Link to="/contacts" className="flex-1 glass-card-hover p-3 flex flex-col items-center gap-1.5 text-center">
