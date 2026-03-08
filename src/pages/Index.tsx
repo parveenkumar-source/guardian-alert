@@ -277,6 +277,8 @@ const Index = () => {
           <div className="w-full max-w-xs space-y-3">
             <SafetyCheckin />
             <JourneyTracker />
+            <WalkBuddy />
+            <SafetyScoreCard />
             <EmergencyInfoCard />
             <SafeZones />
           </div>
