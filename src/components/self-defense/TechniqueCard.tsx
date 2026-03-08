@@ -1,5 +1,7 @@
-import { ChevronDown, ChevronUp, type LucideIcon } from "lucide-react";
+import { useState } from "react";
+import { ChevronDown, Image, Play, type LucideIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import AnimatedDemo from "./AnimatedDemo";
 
 interface Technique {
   title: string;
@@ -18,6 +20,8 @@ interface TechniqueCardProps {
 }
 
 const TechniqueCard = ({ technique: tech, isOpen, onToggle }: TechniqueCardProps) => {
+  const [viewMode, setViewMode] = useState<"demo" | "image">("demo");
+
   return (
     <div className={`glass-card overflow-hidden transition-all duration-300 ${isOpen ? "ring-1 ring-primary/20 shadow-lg shadow-primary/5" : "hover:border-border/60"}`}>
       <button
@@ -50,20 +54,54 @@ const TechniqueCard = ({ technique: tech, isOpen, onToggle }: TechniqueCardProps
             className="overflow-hidden"
           >
             <div className="px-4 pb-4 space-y-4">
-              {/* Illustration */}
-              <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.1, duration: 0.4, ease: "easeOut" }}
-                className="rounded-xl overflow-hidden border border-border/40 bg-secondary/30"
-              >
-                <img
-                  src={tech.image}
-                  alt={`${tech.title} illustration`}
-                  className="w-full h-44 sm:h-52 object-cover"
-                  loading="lazy"
+              {/* View mode toggle */}
+              <div className="flex items-center gap-1.5 mb-3">
+                <button
+                  onClick={() => setViewMode("demo")}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
+                    viewMode === "demo"
+                      ? "bg-primary/15 text-primary"
+                      : "bg-secondary/60 text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Play className="w-3 h-3" />
+                  Watch Demo
+                </button>
+                <button
+                  onClick={() => setViewMode("image")}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
+                    viewMode === "image"
+                      ? "bg-primary/15 text-primary"
+                      : "bg-secondary/60 text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Image className="w-3 h-3" />
+                  View Image
+                </button>
+              </div>
+
+              {/* Illustration or Demo */}
+              {viewMode === "demo" ? (
+                <AnimatedDemo
+                  image={tech.image}
+                  title={tech.title}
+                  steps={tech.steps}
                 />
-              </motion.div>
+              ) : (
+                <motion.div
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.1, duration: 0.4, ease: "easeOut" }}
+                  className="rounded-xl overflow-hidden border border-border/40 bg-secondary/30"
+                >
+                  <img
+                    src={tech.image}
+                    alt={`${tech.title} illustration`}
+                    className="w-full h-44 sm:h-52 object-cover"
+                    loading="lazy"
+                  />
+                </motion.div>
+              )}
 
               {/* Steps */}
               <div className="space-y-2.5">
