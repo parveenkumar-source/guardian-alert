@@ -39,9 +39,15 @@ const ContactsPage = () => {
     setLoading(false);
   };
 
+  const isValidE164 = (num: string) => /^\+[1-9]\d{6,14}$/.test(num);
+
   const handleAdd = async () => {
     if (!name.trim() || !phone.trim()) {
       toast({ title: "Please fill in name and phone number", variant: "destructive" });
+      return;
+    }
+    if (!isValidE164(phone.trim())) {
+      toast({ title: "Phone must be in E.164 format (e.g. +919876119169)", variant: "destructive" });
       return;
     }
     const { data, error } = await supabase
