@@ -114,7 +114,7 @@ const HotspotAnalytics = () => {
       const { default: autoTable } = await import("jspdf-autotable");
 
       const doc = new jsPDF();
-      const now = new Date().toLocaleDateString("hi-IN", { year: "numeric", month: "long", day: "numeric" });
+      const now = new Date().toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" });
 
       // Title
       doc.setFontSize(20);
