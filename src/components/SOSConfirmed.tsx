@@ -134,7 +134,7 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
         </div>
 
         {/* WhatsApp Alert Section */}
-        {contacts.length > 0 && (
+        {contacts.length > 0 && settings.notify_whatsapp && (
           <div className="w-full space-y-3">
             <button
               onClick={sendAllWhatsApp}
