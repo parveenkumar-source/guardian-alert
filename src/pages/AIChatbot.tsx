@@ -1,23 +1,105 @@
-import { useState, useRef, useEffect } from "react";
-import { Bot, Send, Trash2, Sparkles } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Bot, Send, Trash2, Sparkles, Plus, History, ChevronLeft } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 type Msg = { role: "user" | "assistant"; content: string };
+type Conversation = { id: string; title: string; created_at: string; updated_at: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chatbot`;
 
 const AIChatbot = () => {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Load conversation list
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("chat_conversations" as any)
+      .select("*")
+      .eq("user_id", user.id)
+      .order("updated_at", { ascending: false })
+      .then(({ data }) => {
+        if (data) setConversations(data as any);
+      });
+  }, [user]);
+
+  // Load messages for active conversation
+  const loadConversation = useCallback(async (convId: string) => {
+    const { data } = await supabase
+      .from("chat_messages" as any)
+      .select("role, content")
+      .eq("conversation_id", convId)
+      .order("created_at", { ascending: true }) as any;
+    if (data) {
+      setMessages(data.map((m: any) => ({ role: m.role, content: m.content })));
+    }
+    setConversationId(convId);
+    setShowHistory(false);
+  }, []);
+
+  // Load most recent conversation on mount
+  useEffect(() => {
+    if (!user || conversations.length === 0) return;
+    // Auto-load the most recent conversation
+    if (!conversationId && conversations.length > 0) {
+      loadConversation(conversations[0].id);
+    }
+  }, [user, conversations, conversationId, loadConversation]);
+
+  const saveMessage = useCallback(async (convId: string, msg: Msg) => {
+    if (!user) return;
+    await supabase.from("chat_messages" as any).insert({
+      conversation_id: convId,
+      role: msg.role,
+      content: msg.content,
+    } as any);
+  }, [user]);
+
+  const createConversation = useCallback(async (firstMessage: string): Promise<string | null> => {
+    if (!user) return null;
+    const title = firstMessage.slice(0, 60) + (firstMessage.length > 60 ? "…" : "");
+    const { data } = await supabase
+      .from("chat_conversations" as any)
+      .insert({ user_id: user.id, title } as any)
+      .select("id")
+      .single() as any;
+    if (data) {
+      setConversations((prev) => [{ id: data.id, title, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }, ...prev]);
+      return data.id;
+    }
+    return null;
+  }, [user]);
+
+  const startNewChat = useCallback(() => {
+    setMessages([]);
+    setConversationId(null);
+    setShowHistory(false);
+  }, []);
+
+  const deleteConversation = useCallback(async (convId: string) => {
+    await supabase.from("chat_conversations" as any).delete().eq("id", convId);
+    setConversations((prev) => prev.filter((c) => c.id !== convId));
+    if (conversationId === convId) {
+      setMessages([]);
+      setConversationId(null);
+    }
+  }, [conversationId]);
 
   const sendMessage = async () => {
     const text = input.trim();
@@ -28,6 +110,16 @@ const AIChatbot = () => {
     setMessages(allMessages);
     setInput("");
     setIsLoading(true);
+
+    // Ensure conversation exists
+    let activeConvId = conversationId;
+    if (!activeConvId && user) {
+      activeConvId = await createConversation(text);
+      setConversationId(activeConvId);
+    }
+
+    // Save user message
+    if (activeConvId) await saveMessage(activeConvId, userMsg);
 
     let assistantSoFar = "";
 
@@ -82,8 +174,16 @@ const AIChatbot = () => {
           }
         }
       }
+
+      // Save assistant message
+      if (activeConvId && assistantSoFar) {
+        await saveMessage(activeConvId, { role: "assistant", content: assistantSoFar });
+        // Update conversation timestamp
+        await supabase.from("chat_conversations" as any).update({ updated_at: new Date().toISOString() } as any).eq("id", activeConvId);
+      }
     } catch (e: any) {
-      setMessages((prev) => [...prev, { role: "assistant", content: `⚠️ ${e.message || "Something went wrong"}` }]);
+      const errMsg = `⚠️ ${e.message || "Something went wrong"}`;
+      setMessages((prev) => [...prev, { role: "assistant", content: errMsg }]);
     } finally {
       setIsLoading(false);
     }
@@ -100,7 +200,27 @@ const AIChatbot = () => {
     <div className="min-h-screen pt-14 pb-20 md:pb-0 flex flex-col">
       <div className="container mx-auto max-w-2xl px-3 sm:px-4 flex-1 flex flex-col">
         {/* Header */}
-        <div className="py-5 sm:py-6 text-center">
+        <div className="py-5 sm:py-6 text-center relative">
+          <div className="absolute left-0 top-5 flex gap-1">
+            {user && (
+              <>
+                <button
+                  onClick={() => setShowHistory(!showHistory)}
+                  className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+                  title="Chat history"
+                >
+                  <History className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={startNewChat}
+                  className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+                  title="New chat"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </>
+            )}
+          </div>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium mb-3">
             <Sparkles className="w-3.5 h-3.5" />
             AI
@@ -108,6 +228,39 @@ const AIChatbot = () => {
           <h1 className="font-display text-xl sm:text-2xl font-bold text-foreground">{t("chatbot_title")}</h1>
           <p className="text-muted-foreground text-xs sm:text-sm mt-1 max-w-sm mx-auto">{t("chatbot_subtitle")}</p>
         </div>
+
+        {/* History sidebar */}
+        {showHistory && (
+          <div className="mb-4 glass-card rounded-2xl p-3 max-h-64 overflow-y-auto space-y-1">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-muted-foreground">Chat History</span>
+              <button onClick={() => setShowHistory(false)} className="p-1 text-muted-foreground hover:text-foreground">
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            {conversations.length === 0 && (
+              <p className="text-xs text-muted-foreground py-2 text-center">No conversations yet</p>
+            )}
+            {conversations.map((conv) => (
+              <div
+                key={conv.id}
+                className={`flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-sm cursor-pointer transition-colors ${
+                  conv.id === conversationId ? "bg-primary/10 text-primary" : "hover:bg-secondary text-foreground"
+                }`}
+              >
+                <span className="truncate flex-1" onClick={() => loadConversation(conv.id)}>
+                  {(conv as any).title}
+                </span>
+                <button
+                  onClick={(e) => { e.stopPropagation(); deleteConversation(conv.id); }}
+                  className="p-1 text-muted-foreground hover:text-destructive shrink-0"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Messages */}
         <div className="flex-1 space-y-3 sm:space-y-4 pb-4 overflow-y-auto">
@@ -161,7 +314,7 @@ const AIChatbot = () => {
         <div className="sticky bottom-16 md:bottom-0 pb-3 sm:pb-4 pt-2 bg-gradient-to-t from-background via-background to-transparent">
           <div className="flex items-end gap-2">
             {messages.length > 0 && (
-              <button onClick={() => setMessages([])} className="p-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary active:scale-90 transition-all shrink-0">
+              <button onClick={startNewChat} className="p-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary active:scale-90 transition-all shrink-0">
                 <Trash2 className="w-4 h-4" />
               </button>
             )}
