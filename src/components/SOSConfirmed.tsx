@@ -3,6 +3,7 @@ import { CheckCircle, MapPin, Share2, MessageCircle, Send } from "lucide-react";
 import { generateSOSMessage } from "@/lib/contacts";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useSettings } from "@/hooks/useSettings";
 
 interface Contact {
   name: string;
@@ -20,10 +21,15 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
   const [smsSending, setSmsSending] = useState(false);
   const [whatsappSentTo, setWhatsappSentTo] = useState<Set<string>>(new Set());
   const { toast } = useToast();
+  const { settings } = useSettings();
 
-  const message = location
+  const baseMessage = location
     ? generateSOSMessage(location.latitude, location.longitude)
     : "🚨 EMERGENCY SOS ALERT! I need immediate help!";
+
+  const message = settings.custom_message
+    ? `${baseMessage}\n\n${settings.custom_message}`
+    : baseMessage;
 
   useEffect(() => {
     supabase
@@ -34,8 +40,9 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
       });
   }, []);
 
-  // Auto-send SMS on mount
+  // Auto-send SMS on mount (if enabled)
   useEffect(() => {
+    if (!settings.notify_sms) return;
     const sendSMS = async () => {
       setSmsSending(true);
       try {
@@ -127,7 +134,7 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
         </div>
 
         {/* WhatsApp Alert Section */}
-        {contacts.length > 0 && (
+        {contacts.length > 0 && settings.notify_whatsapp && (
           <div className="w-full space-y-3">
             <button
               onClick={sendAllWhatsApp}

@@ -95,6 +95,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_settings: {
+        Row: {
+          countdown_seconds: number
+          created_at: string
+          custom_message: string | null
+          id: string
+          notify_sms: boolean
+          notify_whatsapp: boolean
+          shake_detection: boolean
+          updated_at: string
+          user_id: string
+          voice_detection: boolean
+        }
+        Insert: {
+          countdown_seconds?: number
+          created_at?: string
+          custom_message?: string | null
+          id?: string
+          notify_sms?: boolean
+          notify_whatsapp?: boolean
+          shake_detection?: boolean
+          updated_at?: string
+          user_id: string
+          voice_detection?: boolean
+        }
+        Update: {
+          countdown_seconds?: number
+          created_at?: string
+          custom_message?: string | null
+          id?: string
+          notify_sms?: boolean
+          notify_whatsapp?: boolean
+          shake_detection?: boolean
+          updated_at?: string
+          user_id?: string
+          voice_detection?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

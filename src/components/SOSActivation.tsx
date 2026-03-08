@@ -4,10 +4,11 @@ import { X } from "lucide-react";
 interface SOSActivationProps {
   onCancel: () => void;
   onConfirm: () => void;
+  countdownSeconds?: number;
 }
 
-const SOSActivation = ({ onCancel, onConfirm }: SOSActivationProps) => {
-  const [countdown, setCountdown] = useState(10);
+const SOSActivation = ({ onCancel, onConfirm, countdownSeconds = 10 }: SOSActivationProps) => {
+  const [countdown, setCountdown] = useState(countdownSeconds);
 
   useEffect(() => {
     if (countdown <= 0) {
@@ -18,7 +19,7 @@ const SOSActivation = ({ onCancel, onConfirm }: SOSActivationProps) => {
     return () => clearTimeout(timer);
   }, [countdown, onConfirm]);
 
-  const progress = ((10 - countdown) / 10) * 100;
+  const progress = ((countdownSeconds - countdown) / countdownSeconds) * 100;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-xl">

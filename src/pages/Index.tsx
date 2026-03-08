@@ -13,10 +13,11 @@ import { useAuth } from "@/hooks/useAuth";
 import useShakeDetection from "@/hooks/useShakeDetection";
 import useVoiceDetection from "@/hooks/useVoiceDetection";
 import { logSOSTrigger, TriggerType } from "@/lib/activityLog";
+import { useSettings } from "@/hooks/useSettings";
 
 const Index = () => {
+  const { settings, updateSettings } = useSettings();
   const [sosState, setSosState] = useState<"idle" | "activating" | "confirmed" | "panic">("idle");
-  const [voiceEnabled, setVoiceEnabled] = useState(false);
   const { location, getLocation } = useGeolocation();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -60,28 +61,29 @@ const Index = () => {
     }
   };
 
-  // Shake detection
+  // Shake detection — respects settings
   useShakeDetection({
     threshold: 25,
     debounceMs: 5000,
-    onShake: () => handleSOSTrigger("shake"),
+    onShake: settings.shake_detection ? () => handleSOSTrigger("shake") : () => {},
   });
 
-  // Voice detection
+  // Voice detection — respects settings
   const { listening, supported: voiceSupported } = useVoiceDetection({
-    enabled: voiceEnabled,
+    enabled: settings.voice_detection,
     onDistressDetected: () => handleSOSTrigger("voice"),
     debounceMs: 5000,
   });
 
-  const toggleVoice = () => {
-    if (!voiceEnabled) {
+  const toggleVoice = async () => {
+    const newVal = !settings.voice_detection;
+    if (newVal) {
       toast({
         title: "Voice Detection Enabled",
         description: 'Say "Help", "Bachao", or "SOS" to trigger an alert.',
       });
     }
-    setVoiceEnabled(!voiceEnabled);
+    await updateSettings({ voice_detection: newVal });
   };
 
   const handleSOSConfirm = () => setSosState("confirmed");
@@ -98,7 +100,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen pt-16">
-      {sosState === "activating" && <SOSActivation onCancel={handleSOSCancel} onConfirm={handleSOSConfirm} />}
+      {sosState === "activating" && <SOSActivation onCancel={handleSOSCancel} onConfirm={handleSOSConfirm} countdownSeconds={settings.countdown_seconds} />}
       {sosState === "confirmed" && <SOSConfirmed location={location} onDismiss={handleSOSDismiss} />}
       {sosState === "panic" && <PanicMode location={location} onExit={handlePanicExit} />}
 
@@ -145,12 +147,12 @@ const Index = () => {
               <button
                 onClick={toggleVoice}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all ${
-                  voiceEnabled
+                  settings.voice_detection
                     ? "bg-safe/15 text-safe border border-safe/30"
                     : "bg-secondary text-muted-foreground border border-border hover:text-foreground"
                 }`}
               >
-                {voiceEnabled ? (
+                {settings.voice_detection ? (
                   <>
                     <Mic className={`w-3.5 h-3.5 ${listening ? "animate-pulse" : ""}`} />
                     Voice {listening && "· Listening"}
