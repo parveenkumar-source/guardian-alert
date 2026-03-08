@@ -153,6 +153,25 @@ const Evidence = () => {
           </div>
         ) : (
           <div className="space-y-3">
+            {/* Export All button */}
+            <button
+              onClick={handleExportAll}
+              disabled={exporting}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-primary text-primary-foreground font-medium text-sm transition-all hover:bg-primary/90 disabled:opacity-50"
+            >
+              {exporting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Packaging {records.length} files…
+                </>
+              ) : (
+                <>
+                  <Archive className="w-4 h-4" />
+                  Export All as ZIP ({records.length} files)
+                </>
+              )}
+            </button>
+
             {records.map((record) => (
               <div key={record.id} className="glass-card p-4 flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
