@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { CheckCircle, MapPin, Share2, MessageCircle, Send } from "lucide-react";
+import { CheckCircle, MapPin, Share2, MessageCircle, Send, Mic } from "lucide-react";
 import { generateSOSMessage } from "@/lib/contacts";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/hooks/useSettings";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useAuth } from "@/hooks/useAuth";
 import EvidenceRecorder from "@/components/EvidenceRecorder";
 
 interface Contact {
@@ -12,12 +13,18 @@ interface Contact {
   phone: string;
 }
 
+interface AutoRecording {
+  blob: Blob;
+  duration: number;
+}
+
 interface SOSConfirmedProps {
   location: { latitude: number; longitude: number } | null;
   onDismiss: () => void;
+  autoRecording?: AutoRecording | null;
 }
 
-const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
+const SOSConfirmed = ({ location, onDismiss, autoRecording }: SOSConfirmedProps) => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [smsSent, setSmsSent] = useState(false);
   const [smsSending, setSmsSending] = useState(false);
