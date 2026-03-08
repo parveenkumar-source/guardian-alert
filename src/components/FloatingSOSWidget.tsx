@@ -17,8 +17,6 @@ const FloatingSOSWidget = () => {
   const [expanded, setExpanded] = useState(false);
   const [sending, setSending] = useState(false);
 
-  if (routeLocation.pathname === "/ai-chat") return null;
-
   const quickSOS = useCallback(async () => {
     if (!user) {
       toast({ title: "Sign in first", variant: "destructive" });
@@ -65,7 +63,9 @@ const FloatingSOSWidget = () => {
     window.location.href = "tel:112";
   };
 
-  if (!user) return null;
+  const isHidden = routeLocation.pathname === "/ai-chat";
+
+  if (!user || isHidden) return null;
 
   return (
     <div className="fixed bottom-24 right-4 z-50 md:bottom-6">
