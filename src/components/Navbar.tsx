@@ -10,6 +10,7 @@ const Navbar = () => {
   const links = [
     { to: "/", label: "Home", icon: Home },
     { to: "/safe-routes", label: "Routes", icon: Navigation },
+    { to: "/safety-map", label: "Map", icon: MapPin },
     { to: "/contacts", label: "Contacts", icon: Users },
     { to: "/helplines", label: "Helplines", icon: Phone },
     { to: "/activity", label: "Log", icon: FileText },

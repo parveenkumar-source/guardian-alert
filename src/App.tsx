@@ -40,6 +40,7 @@ const App = () => (
               <Route path="/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
               <Route path="/helplines" element={<Helplines />} />
               <Route path="/safe-routes" element={<ProtectedRoute><SafeRoutes /></ProtectedRoute>} />
+              <Route path="/safety-map" element={<ProtectedRoute><SafetyMap /></ProtectedRoute>} />
               <Route path="/activity" element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
