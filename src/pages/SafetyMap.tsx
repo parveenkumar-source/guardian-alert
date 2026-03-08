@@ -12,6 +12,7 @@ import { MapPin, AlertTriangle, Plus, X, Shield, Eye, Flame, Moon, Car, Users, T
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
+import { useReverseGeocode } from "@/hooks/useReverseGeocode";
 
 interface SafetyReport {
   id: string;
@@ -261,6 +262,10 @@ const SafetyMap = () => {
       .slice(0, 5);
   }, [reports]);
 
+  // Reverse geocode danger zone coordinates
+  const dangerZoneCoords = useMemo(() => dangerZones.map(z => ({ lat: z.lat, lng: z.lng })), [dangerZones]);
+  const { getName } = useReverseGeocode(dangerZoneCoords);
+
   return (
     <div className="min-h-screen bg-background pt-16 pb-24 md:pb-8 px-4 page-transition">
       <div className="container mx-auto max-w-4xl space-y-6">
@@ -395,7 +400,7 @@ const SafetyMap = () => {
                           rel="noopener noreferrer"
                           className="text-xs font-medium text-primary hover:underline truncate"
                         >
-                          📍 {zone.lat.toFixed(4)}, {zone.lng.toFixed(4)}
+                          📍 {getName(zone.lat, zone.lng) || `${zone.lat.toFixed(4)}, ${zone.lng.toFixed(4)}`}
                         </a>
                         <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${
                           zone.maxSeverity === "high" ? "bg-destructive/20 text-destructive" : "bg-orange-500/20 text-orange-400"

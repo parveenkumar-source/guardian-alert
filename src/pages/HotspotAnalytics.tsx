@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useReverseGeocode } from "@/hooks/useReverseGeocode";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -87,6 +88,9 @@ const HotspotAnalytics = () => {
   const topHotspots = hotspots.slice(0, 10);
   const maxCount = topHotspots[0]?.count || 1;
 
+  const hotspotCoords = useMemo(() => topHotspots.map(h => ({ lat: h.lat, lng: h.lng })), [topHotspots]);
+  const { getName } = useReverseGeocode(hotspotCoords);
+
   const severityDistribution = useMemo(() => {
     const dist: Record<string, number> = {};
     for (const r of reports) {
@@ -128,18 +132,21 @@ const HotspotAnalytics = () => {
       doc.setTextColor(40);
       doc.text("Top Sensitive Areas (Sabse Khatarnak Ilake)", 14, 52);
 
-      const tableData = topHotspots.map((h, i) => [
-        `#${i + 1}`,
-        `${h.lat.toFixed(4)}, ${h.lng.toFixed(4)}`,
-        `https://maps.google.com/?q=${h.lat},${h.lng}`,
-        h.count.toString(),
-        Object.entries(h.categories).sort((a, b) => b[1] - a[1]).map(([c, n]) => `${c}(${n})`).join(", "),
-        Object.entries(h.severities).sort((a, b) => b[1] - a[1]).map(([s, n]) => `${s}(${n})`).join(", "),
-      ]);
+      const tableData = topHotspots.map((h, i) => {
+        const areaName = getName(h.lat, h.lng) || `${h.lat.toFixed(4)}, ${h.lng.toFixed(4)}`;
+        return [
+          `#${i + 1}`,
+          areaName,
+          `https://maps.google.com/?q=${h.lat},${h.lng}`,
+          h.count.toString(),
+          Object.entries(h.categories).sort((a, b) => b[1] - a[1]).map(([c, n]) => `${c}(${n})`).join(", "),
+          Object.entries(h.severities).sort((a, b) => b[1] - a[1]).map(([s, n]) => `${s}(${n})`).join(", "),
+        ];
+      });
 
       autoTable(doc, {
         startY: 56,
-        head: [["Rank", "Location (Lat,Lng)", "Google Maps Link", "Total Incidents", "Categories", "Severity"]],
+        head: [["Rank", "Area Name", "Google Maps Link", "Total Incidents", "Categories", "Severity"]],
         body: tableData,
         styles: { fontSize: 7, cellPadding: 2 },
         headStyles: { fillColor: [200, 40, 60], textColor: [255, 255, 255] },
@@ -337,7 +344,7 @@ const HotspotAnalytics = () => {
                             rel="noopener noreferrer"
                             className="text-xs font-medium text-primary hover:underline"
                           >
-                            📍 {h.lat.toFixed(4)}, {h.lng.toFixed(4)}
+                            📍 {getName(h.lat, h.lng) || `${h.lat.toFixed(4)}, ${h.lng.toFixed(4)}`}
                           </a>
                           <div className="flex flex-wrap gap-1 mt-1">
                             {Object.entries(h.severities).map(([s]) => getSeverityBadge(s))}
