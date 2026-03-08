@@ -127,7 +127,7 @@ const Index = () => {
             <div className="absolute inset-0 rounded-full bg-primary/15 sos-ring" style={{ animationDelay: "0.5s" }} />
             <div className="absolute inset-0 rounded-full bg-primary/10 sos-ring" style={{ animationDelay: "1s" }} />
             <button
-              onClick={handleSOSTrigger}
+              onClick={() => handleSOSTrigger("manual")}
               onPointerDown={handleSOSPointerDown}
               onPointerUp={handleSOSPointerUp}
               onPointerLeave={handleSOSPointerUp}
