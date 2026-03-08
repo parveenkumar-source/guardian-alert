@@ -65,6 +65,8 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
           notify_whatsapp: data.notify_whatsapp ?? true,
           shake_detection: data.shake_detection ?? true,
           voice_detection: data.voice_detection ?? false,
+          fake_call_name: data.fake_call_name ?? "Mom",
+          fake_call_delay: data.fake_call_delay ?? 5,
         });
       }
       setLoading(false);
