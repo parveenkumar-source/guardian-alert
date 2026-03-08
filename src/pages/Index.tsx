@@ -13,6 +13,8 @@ import JourneyTracker from "@/components/JourneyTracker";
 import FakeCall from "@/components/FakeCall";
 import EmergencyInfoCard from "@/components/EmergencyInfoCard";
 import SafeZones from "@/components/SafeZones";
+import WalkBuddy from "@/components/WalkBuddy";
+import SafetyScoreCard from "@/components/SafetyScoreCard";
 import DisguiseMode from "@/components/DisguiseMode";
 import useTripleTap from "@/hooks/useTripleTap";
 import useProximityAlert from "@/hooks/useProximityAlert";
