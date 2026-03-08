@@ -46,7 +46,7 @@ const SettingsPage = () => {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-12 px-4">
+    <div className="min-h-screen pt-16 pb-24 md:pb-12 px-4 page-transition">
       <div className="container mx-auto max-w-lg">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
