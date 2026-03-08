@@ -20,6 +20,8 @@ interface TechniqueCardProps {
 }
 
 const TechniqueCard = ({ technique: tech, isOpen, onToggle }: TechniqueCardProps) => {
+  const [viewMode, setViewMode] = useState<"demo" | "image">("demo");
+
   return (
     <div className={`glass-card overflow-hidden transition-all duration-300 ${isOpen ? "ring-1 ring-primary/20 shadow-lg shadow-primary/5" : "hover:border-border/60"}`}>
       <button
