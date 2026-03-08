@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Shield, Users, Home, Phone, LogIn, LogOut, Navigation } from "lucide-react";
+import { Shield, Users, Home, Phone, LogIn, LogOut, Navigation, FileText } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
