@@ -47,6 +47,7 @@ const AnimatedRoutes = () => {
         <Route path="/settings" element={<PageTransition><ProtectedRoute><SettingsPage /></ProtectedRoute></PageTransition>} />
         <Route path="/evidence" element={<PageTransition><ProtectedRoute><Evidence /></ProtectedRoute></PageTransition>} />
         <Route path="/community" element={<PageTransition><ProtectedRoute><CommunityFeed /></ProtectedRoute></PageTransition>} />
+        <Route path="/hotspots" element={<PageTransition><ProtectedRoute><HotspotAnalytics /></ProtectedRoute></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>

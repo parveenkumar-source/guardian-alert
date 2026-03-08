@@ -19,6 +19,7 @@ const Navbar = () => {
 
   const secondaryLinks = [
     { to: "/helplines", label: "Helplines", icon: Phone },
+    { to: "/hotspots", label: "Hotspots", icon: AlertTriangle },
     { to: "/activity", label: "Log", icon: FileText },
     { to: "/evidence", label: "Evidence", icon: Camera },
     { to: "/settings", label: "Settings", icon: Settings },
