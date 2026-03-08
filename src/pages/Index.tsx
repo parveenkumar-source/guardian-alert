@@ -5,6 +5,7 @@ import { generateSOSMessage } from "@/lib/contacts";
 import { supabase } from "@/integrations/supabase/client";
 import SOSActivation from "@/components/SOSActivation";
 import SOSConfirmed from "@/components/SOSConfirmed";
+import SafetyTips from "@/components/SafetyTips";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
