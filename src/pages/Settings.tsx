@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { Settings, Clock, MessageSquare, Bell, Vibrate, Mic, Save, Check } from "lucide-react";
+import { Settings, Clock, MessageSquare, Bell, Vibrate, Mic, Save, Check, BellRing } from "lucide-react";
 import { useSettings } from "@/hooks/useSettings";
 import { useToast } from "@/hooks/use-toast";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 const countdownOptions = [3, 5, 7, 10, 15, 20];
 
 const SettingsPage = () => {
   const { settings, loading, updateSettings } = useSettings();
   const { toast } = useToast();
+  const push = usePushNotifications();
   const [local, setLocal] = useState(settings);
   const [saving, setSaving] = useState(false);
   const [synced, setSynced] = useState(true);
@@ -122,6 +124,49 @@ const SettingsPage = () => {
               checked={local.notify_whatsapp}
               onChange={(v) => handleChange("notify_whatsapp", v)}
             />
+
+            {/* Push Notifications */}
+            {push.supported && (
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="text-muted-foreground">
+                    <BellRing className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Push Notifications</p>
+                    <p className="text-xs text-muted-foreground">
+                      {push.permission === "denied"
+                        ? "Blocked in browser settings"
+                        : "Get alerts even when app is closed"}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={async () => {
+                    if (push.subscribed) {
+                      await push.unsubscribe();
+                      toast({ title: "Push notifications disabled" });
+                    } else {
+                      const ok = await push.subscribe();
+                      toast({
+                        title: ok ? "Push notifications enabled!" : "Could not enable push",
+                        variant: ok ? "default" : "destructive",
+                      });
+                    }
+                  }}
+                  disabled={push.loading || push.permission === "denied"}
+                  className={`relative w-11 h-6 rounded-full transition-colors disabled:opacity-50 ${
+                    push.subscribed ? "bg-primary" : "bg-secondary"
+                  }`}
+                >
+                  <div
+                    className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
+                      push.subscribed ? "translate-x-[22px]" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
+              </div>
+            )}
           </section>
 
           {/* Detection Preferences */}

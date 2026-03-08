@@ -1,4 +1,4 @@
-const CACHE_NAME = "raksha-v1";
+const CACHE_NAME = "raksha-v2";
 const PRECACHE_URLS = ["/", "/index.html"];
 
 self.addEventListener("install", (event) => {
@@ -18,7 +18,6 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  // Network-first for API/function calls, cache-first for static assets
   if (
     event.request.url.includes("/functions/") ||
     event.request.url.includes("supabase") ||
@@ -35,5 +34,52 @@ self.addEventListener("fetch", (event) => {
         return response;
       })
       .catch(() => caches.match(event.request))
+  );
+});
+
+// Push notification handler
+self.addEventListener("push", (event) => {
+  let data = { title: "Raksha Alert", body: "You have a new safety alert.", icon: "/icon-192.png" };
+
+  if (event.data) {
+    try {
+      data = { ...data, ...event.data.json() };
+    } catch {
+      data.body = event.data.text();
+    }
+  }
+
+  const options = {
+    body: data.body,
+    icon: data.icon || "/icon-192.png",
+    badge: "/icon-192.png",
+    vibrate: [200, 100, 200, 100, 200],
+    tag: "raksha-sos",
+    renotify: true,
+    requireInteraction: true,
+    actions: [
+      { action: "open", title: "Open Raksha" },
+      { action: "dismiss", title: "Dismiss" },
+    ],
+  };
+
+  event.waitUntil(self.registration.showNotification(data.title, options));
+});
+
+// Notification click handler
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+
+  if (event.action === "dismiss") return;
+
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((windowClients) => {
+      for (const client of windowClients) {
+        if (client.url.includes(self.location.origin) && "focus" in client) {
+          return client.focus();
+        }
+      }
+      return clients.openWindow("/");
+    })
   );
 });

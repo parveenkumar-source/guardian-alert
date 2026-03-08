@@ -4,6 +4,7 @@ import { generateSOSMessage } from "@/lib/contacts";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/hooks/useSettings";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 interface Contact {
   name: string;
@@ -22,6 +23,7 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
   const [whatsappSentTo, setWhatsappSentTo] = useState<Set<string>>(new Set());
   const { toast } = useToast();
   const { settings } = useSettings();
+  const { sendPushToSelf, subscribed: pushSubscribed } = usePushNotifications();
 
   const baseMessage = location
     ? generateSOSMessage(location.latitude, location.longitude)
@@ -68,6 +70,16 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
       }
     };
     sendSMS();
+
+    // Also send push notification
+    if (pushSubscribed) {
+      sendPushToSelf(
+        "🚨 SOS Alert Sent",
+        location
+          ? `Emergency alert sent with your location. Stay safe.`
+          : "Emergency alert sent to your contacts."
+      );
+    }
   }, []);
 
   const openWhatsApp = (contact: Contact) => {
