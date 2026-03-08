@@ -10,6 +10,7 @@ import Contacts from "./pages/Contacts";
 import Helplines from "./pages/Helplines";
 import Auth from "./pages/Auth";
 import SafeRoutes from "./pages/SafeRoutes";
+import ActivityLog from "./pages/ActivityLog";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
