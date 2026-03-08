@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Settings, Clock, MessageSquare, Bell, Vibrate, Mic, Save, Check, BellRing, PhoneIncoming, Hand, Radar } from "lucide-react";
 import { useSettings } from "@/hooks/useSettings";
 import { useToast } from "@/hooks/use-toast";
@@ -14,12 +14,13 @@ const SettingsPage = () => {
   const [saving, setSaving] = useState(false);
   const [synced, setSynced] = useState(true);
 
-  // Sync local state when settings load
-  const [initialized, setInitialized] = useState(false);
-  if (!initialized && !loading) {
-    setLocal(settings);
-    setInitialized(true);
-  }
+  // Sync local state whenever settings change from the provider
+  useEffect(() => {
+    if (!loading) {
+      setLocal(settings);
+      setSynced(true);
+    }
+  }, [loading, settings]);
 
   const handleChange = <K extends keyof typeof local>(key: K, value: (typeof local)[K]) => {
     setLocal((prev) => ({ ...prev, [key]: value }));
