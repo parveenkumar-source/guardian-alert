@@ -184,7 +184,26 @@ const Index = () => {
               <EyeOff className="w-3.5 h-3.5" />
               Stealth
             </button>
+            <button
+              onClick={() => setFakeCallActive(true)}
+              disabled={fakeCallActive}
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium bg-secondary text-muted-foreground border border-border hover:text-foreground transition-all disabled:opacity-50"
+            >
+              <PhoneIncoming className="w-3.5 h-3.5" />
+              Fake Call
+            </button>
           </div>
+
+          {/* Fake Call Widget */}
+          {fakeCallActive && (
+            <div className="w-full max-w-xs">
+              <FakeCall
+                callerName="Mom"
+                delay={fakeCallDelay}
+                onEnd={() => setFakeCallActive(false)}
+              />
+            </div>
+          )}
 
           <div className="flex gap-3 w-full max-w-xs">
             <Link to="/contacts" className="flex-1 glass-card-hover p-3 flex flex-col items-center gap-1.5 text-center">
