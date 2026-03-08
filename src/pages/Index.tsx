@@ -109,7 +109,7 @@ const Index = () => {
       {sosState === "confirmed" && <SOSConfirmed location={location} onDismiss={handleSOSDismiss} />}
       {sosState === "panic" && <PanicMode location={location} onExit={handlePanicExit} />}
       {fakeCallActive && (
-        <FakeCall callerName="Mom" delay={fakeCallDelay} onEnd={() => setFakeCallActive(false)} />
+        <FakeCall callerName="Mom" delay={fakeCallDelay} onEnd={() => setFakeCallActive(false)} key="fake-call" />
       )}
 
       <section className="relative min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-4 overflow-hidden">
