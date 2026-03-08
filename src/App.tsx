@@ -11,6 +11,7 @@ import Contacts from "./pages/Contacts";
 import Helplines from "./pages/Helplines";
 import Auth from "./pages/Auth";
 import SafeRoutes from "./pages/SafeRoutes";
+import SafetyMap from "./pages/SafetyMap";
 import ActivityLog from "./pages/ActivityLog";
 import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
