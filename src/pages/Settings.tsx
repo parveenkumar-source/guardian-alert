@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Settings, Clock, MessageSquare, Bell, Vibrate, Mic, Save, Check } from "lucide-react";
+import { Settings, Clock, MessageSquare, Bell, Vibrate, Mic, Save, Check, BellRing } from "lucide-react";
 import { useSettings } from "@/hooks/useSettings";
 import { useToast } from "@/hooks/use-toast";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 const countdownOptions = [3, 5, 7, 10, 15, 20];
 
