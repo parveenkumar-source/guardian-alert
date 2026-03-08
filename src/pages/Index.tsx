@@ -108,6 +108,9 @@ const Index = () => {
       {sosState === "activating" && <SOSActivation onCancel={handleSOSCancel} onConfirm={handleSOSConfirm} countdownSeconds={settings.countdown_seconds} />}
       {sosState === "confirmed" && <SOSConfirmed location={location} onDismiss={handleSOSDismiss} />}
       {sosState === "panic" && <PanicMode location={location} onExit={handlePanicExit} />}
+      {fakeCallActive && (
+        <FakeCall callerName="Mom" delay={fakeCallDelay} onEnd={() => setFakeCallActive(false)} />
+      )}
 
       <section className="relative min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-4 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
