@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { Shield, ChevronDown, ChevronUp, AlertTriangle, Zap, Hand, Target, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+
+import wristGrabImg from "@/assets/self-defense/wrist-grab.png";
+import palmStrikeImg from "@/assets/self-defense/palm-strike.png";
+import kneeStrikeImg from "@/assets/self-defense/knee-strike.png";
+import bearHugImg from "@/assets/self-defense/bear-hug.png";
+import hairGrabImg from "@/assets/self-defense/hair-grab.png";
+import keysDefenseImg from "@/assets/self-defense/keys-defense.png";
+
+import TechniqueCard from "@/components/self-defense/TechniqueCard";
 
 interface Technique {
   title: string;
@@ -9,6 +19,7 @@ interface Technique {
   tip: string;
   icon: typeof Shield;
   color: string;
+  image: string;
 }
 
 const techniques: Technique[] = [
@@ -25,6 +36,7 @@ const techniques: Technique[] = [
     tip: "The thumb is always the weakest link in any grip. Rotate and pull toward it.",
     icon: Hand,
     color: "text-blue-500",
+    image: wristGrabImg,
   },
   {
     title: "Palm Strike",
@@ -39,6 +51,7 @@ const techniques: Technique[] = [
     tip: "A palm strike is safer for your hand than a punch and equally effective.",
     icon: Zap,
     color: "text-amber-500",
+    image: palmStrikeImg,
   },
   {
     title: "Knee Strike",
@@ -53,6 +66,7 @@ const techniques: Technique[] = [
     tip: "This works best when the attacker is within arm's reach. Aim for the groin.",
     icon: Target,
     color: "text-rose-500",
+    image: kneeStrikeImg,
   },
   {
     title: "Bear Hug Escape (From Behind)",
@@ -67,6 +81,7 @@ const techniques: Technique[] = [
     tip: "Dropping your center of gravity makes you much harder to hold.",
     icon: Shield,
     color: "text-purple-500",
+    image: bearHugImg,
   },
   {
     title: "Hair Grab Defense",
@@ -81,6 +96,7 @@ const techniques: Technique[] = [
     tip: "Never pull away from a hair grab — it gives them more control. Press their hand down first.",
     icon: AlertTriangle,
     color: "text-orange-500",
+    image: hairGrabImg,
   },
   {
     title: "Keys as Defensive Tool",
@@ -95,6 +111,7 @@ const techniques: Technique[] = [
     tip: "Your keys, water bottle, or bag strap can all serve as defensive tools in emergencies.",
     icon: Zap,
     color: "text-emerald-500",
+    image: keysDefenseImg,
   },
 ];
 
@@ -159,51 +176,17 @@ const SelfDefense = () => {
 
         {/* Techniques */}
         <div className="space-y-2.5">
-          {filtered.map((tech, i) => {
+          {filtered.map((tech) => {
             const realIdx = techniques.indexOf(tech);
             const isOpen = expandedIdx === realIdx;
 
             return (
-              <div key={tech.title} className="glass-card overflow-hidden">
-                <button
-                  onClick={() => setExpandedIdx(isOpen ? null : realIdx)}
-                  className="w-full p-4 flex items-center gap-3 text-left"
-                >
-                  <div className={`w-9 h-9 rounded-lg bg-secondary flex items-center justify-center shrink-0`}>
-                    <tech.icon className={`w-4.5 h-4.5 ${tech.color}`} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">{tech.title}</p>
-                    <p className="text-[11px] text-muted-foreground truncate">{tech.situation}</p>
-                  </div>
-                  {isOpen ? (
-                    <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
-                  )}
-                </button>
-
-                {isOpen && (
-                  <div className="px-4 pb-4 space-y-3">
-                    <div className="space-y-2">
-                      {tech.steps.map((step, si) => (
-                        <div key={si} className="flex items-start gap-2.5">
-                          <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
-                            {si + 1}
-                          </span>
-                          <p className="text-xs text-foreground leading-relaxed">{step}</p>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="p-2.5 rounded-lg bg-primary/5 border border-primary/10">
-                      <p className="text-[11px] text-primary font-medium">
-                        💡 Pro Tip: {tech.tip}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <TechniqueCard
+                key={tech.title}
+                technique={tech}
+                isOpen={isOpen}
+                onToggle={() => setExpandedIdx(isOpen ? null : realIdx)}
+              />
             );
           })}
         </div>
