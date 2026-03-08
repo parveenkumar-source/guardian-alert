@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import { Shield, MapPin, Users, Bell, ChevronRight, Phone, Mic, MicOff, EyeOff } from "lucide-react";
+import { Shield, MapPin, Users, Bell, ChevronRight, Phone, Mic, MicOff, EyeOff, PhoneIncoming } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { generateSOSMessage } from "@/lib/contacts";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,7 @@ import SafetyTips from "@/components/SafetyTips";
 import PanicMode from "@/components/PanicMode";
 import SafetyCheckin from "@/components/SafetyCheckin";
 import JourneyTracker from "@/components/JourneyTracker";
+import FakeCall from "@/components/FakeCall";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
