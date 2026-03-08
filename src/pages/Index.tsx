@@ -1,11 +1,12 @@
-import { useState, useCallback } from "react";
-import { Shield, MapPin, Users, Bell, ChevronRight, Phone, Mic, MicOff } from "lucide-react";
+import { useState, useCallback, useRef } from "react";
+import { Shield, MapPin, Users, Bell, ChevronRight, Phone, Mic, MicOff, EyeOff } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { generateSOSMessage } from "@/lib/contacts";
 import { supabase } from "@/integrations/supabase/client";
 import SOSActivation from "@/components/SOSActivation";
 import SOSConfirmed from "@/components/SOSConfirmed";
 import SafetyTips from "@/components/SafetyTips";
+import PanicMode from "@/components/PanicMode";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,35 +14,57 @@ import useShakeDetection from "@/hooks/useShakeDetection";
 import useVoiceDetection from "@/hooks/useVoiceDetection";
 
 const Index = () => {
-  const [sosState, setSosState] = useState<"idle" | "activating" | "confirmed">("idle");
+  const [sosState, setSosState] = useState<"idle" | "activating" | "confirmed" | "panic">("idle");
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const { location, getLocation } = useGeolocation();
   const { toast } = useToast();
   const { user } = useAuth();
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleSOSTrigger = useCallback(async () => {
-    if (sosState !== "idle") return;
+  const canTrigger = useCallback(async () => {
+    if (sosState !== "idle") return false;
     if (!user) {
       toast({ title: "Please sign in first", description: "You need to be logged in to use SOS.", variant: "destructive" });
-      return;
+      return false;
     }
     const { count } = await supabase.from("emergency_contacts").select("id", { count: "exact", head: true });
     if (!count || count === 0) {
       toast({ title: "No Emergency Contacts", description: "Please add at least one emergency contact first.", variant: "destructive" });
-      return;
+      return false;
     }
+    return true;
+  }, [sosState, user, toast]);
+
+  const handleSOSTrigger = useCallback(async () => {
+    if (!(await canTrigger())) return;
     getLocation();
     setSosState("activating");
-  }, [sosState, user, toast, getLocation]);
+  }, [canTrigger, getLocation]);
 
-  // Shake detection — triggers SOS when phone is shaken vigorously
+  // Long press SOS button → panic mode
+  const handleSOSPointerDown = () => {
+    longPressTimer.current = setTimeout(async () => {
+      if (!(await canTrigger())) return;
+      getLocation();
+      setSosState("panic");
+    }, 1500);
+  };
+
+  const handleSOSPointerUp = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
+  // Shake detection
   useShakeDetection({
     threshold: 25,
     debounceMs: 5000,
     onShake: handleSOSTrigger,
   });
 
-  // Voice detection — triggers SOS on distress keywords ("help", "bachao", etc.)
+  // Voice detection
   const { listening, supported: voiceSupported } = useVoiceDetection({
     enabled: voiceEnabled,
     onDistressDetected: handleSOSTrigger,
@@ -61,6 +84,7 @@ const Index = () => {
   const handleSOSConfirm = () => setSosState("confirmed");
   const handleSOSCancel = () => setSosState("idle");
   const handleSOSDismiss = () => setSosState("idle");
+  const handlePanicExit = () => setSosState("idle");
 
   const features = [
     { icon: MapPin, title: "Live GPS Tracking", description: "Real-time location sharing with emergency contacts" },
@@ -73,6 +97,7 @@ const Index = () => {
     <div className="min-h-screen pt-16">
       {sosState === "activating" && <SOSActivation onCancel={handleSOSCancel} onConfirm={handleSOSConfirm} />}
       {sosState === "confirmed" && <SOSConfirmed location={location} onDismiss={handleSOSDismiss} />}
+      {sosState === "panic" && <PanicMode location={location} onExit={handlePanicExit} />}
 
       <section className="relative min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-4 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
@@ -100,37 +125,55 @@ const Index = () => {
             <div className="absolute inset-0 rounded-full bg-primary/10 sos-ring" style={{ animationDelay: "1s" }} />
             <button
               onClick={handleSOSTrigger}
+              onPointerDown={handleSOSPointerDown}
+              onPointerUp={handleSOSPointerUp}
+              onPointerLeave={handleSOSPointerUp}
               className="relative w-40 h-40 rounded-full bg-primary text-primary-foreground font-display text-3xl font-bold shadow-[0_0_60px_hsl(var(--primary)/0.4)] hover:shadow-[0_0_80px_hsl(var(--primary)/0.6)] sos-pulse transition-shadow duration-300 active:scale-95"
             >
               SOS
             </button>
           </div>
 
-          <p className="text-muted-foreground text-xs">Press and hold or tap to activate emergency alert</p>
+          <p className="text-muted-foreground text-xs">Tap for SOS · Long press for stealth mode</p>
 
-          {/* Voice Detection Toggle */}
-          {voiceSupported !== false && (
+          {/* Voice Detection Toggle & Panic Mode Button */}
+          <div className="flex items-center gap-2">
+            {voiceSupported !== false && (
+              <button
+                onClick={toggleVoice}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all ${
+                  voiceEnabled
+                    ? "bg-safe/15 text-safe border border-safe/30"
+                    : "bg-secondary text-muted-foreground border border-border hover:text-foreground"
+                }`}
+              >
+                {voiceEnabled ? (
+                  <>
+                    <Mic className={`w-3.5 h-3.5 ${listening ? "animate-pulse" : ""}`} />
+                    Voice {listening && "· Listening"}
+                  </>
+                ) : (
+                  <>
+                    <MicOff className="w-3.5 h-3.5" />
+                    Voice SOS
+                  </>
+                )}
+              </button>
+            )}
+
             <button
-              onClick={toggleVoice}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all ${
-                voiceEnabled
-                  ? "bg-safe/15 text-safe border border-safe/30"
-                  : "bg-secondary text-muted-foreground border border-border hover:text-foreground"
-              }`}
+              onClick={async () => {
+                if (await canTrigger()) {
+                  getLocation();
+                  setSosState("panic");
+                }
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium bg-secondary text-muted-foreground border border-border hover:text-foreground transition-all"
             >
-              {voiceEnabled ? (
-                <>
-                  <Mic className={`w-3.5 h-3.5 ${listening ? "animate-pulse" : ""}`} />
-                  Voice Detection On {listening && "· Listening..."}
-                </>
-              ) : (
-                <>
-                  <MicOff className="w-3.5 h-3.5" />
-                  Enable Voice SOS
-                </>
-              )}
+              <EyeOff className="w-3.5 h-3.5" />
+              Stealth
             </button>
-          )}
+          </div>
 
           <div className="flex gap-3 w-full max-w-xs">
             <Link to="/contacts" className="flex-1 glass-card-hover p-3 flex flex-col items-center gap-1.5 text-center">
