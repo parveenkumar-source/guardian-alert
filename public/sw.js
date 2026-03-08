@@ -1,5 +1,5 @@
-const CACHE_NAME = "raksha-v2";
-const PRECACHE_URLS = ["/", "/index.html"];
+const CACHE_NAME = "raksha-v3";
+const PRECACHE_URLS = ["/", "/index.html", "/offline.html", "/icon-192.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -18,14 +18,32 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
+  // Skip non-GET and API calls
   if (
+    event.request.method !== "GET" ||
     event.request.url.includes("/functions/") ||
-    event.request.url.includes("supabase") ||
-    event.request.method !== "GET"
+    event.request.url.includes("supabase")
   ) {
     return;
   }
 
+  // Navigation requests: network-first with offline fallback
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          return response;
+        })
+        .catch(() =>
+          caches.match(event.request).then((cached) => cached || caches.match("/offline.html"))
+        )
+    );
+    return;
+  }
+
+  // Static assets: network-first with cache fallback
   event.respondWith(
     fetch(event.request)
       .then((response) => {
