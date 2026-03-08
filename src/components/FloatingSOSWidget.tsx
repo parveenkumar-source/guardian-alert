@@ -11,13 +11,13 @@ import { useLocation } from "react-router-dom";
 
 const FloatingSOSWidget = () => {
   const routeLocation = useLocation();
-  if (routeLocation.pathname === "/ai-chat") return null;
-
   const { user } = useAuth();
   const { location, getLocation } = useGeolocation();
   const { toast } = useToast();
   const [expanded, setExpanded] = useState(false);
   const [sending, setSending] = useState(false);
+
+  if (routeLocation.pathname === "/ai-chat") return null;
 
   const quickSOS = useCallback(async () => {
     if (!user) {
