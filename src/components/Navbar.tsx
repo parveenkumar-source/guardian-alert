@@ -13,6 +13,7 @@ const Navbar = () => {
     { to: "/contacts", label: "Contacts", icon: Users },
     { to: "/helplines", label: "Helplines", icon: Phone },
     { to: "/activity", label: "Log", icon: FileText },
+    { to: "/settings", label: "Settings", icon: Settings },
   ];
 
   const handleSignOut = async () => {

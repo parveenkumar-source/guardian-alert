@@ -28,20 +28,23 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
-            <Route path="/helplines" element={<Helplines />} />
-            <Route path="/safe-routes" element={<ProtectedRoute><SafeRoutes /></ProtectedRoute>} />
-            <Route path="/activity" element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <SettingsProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
+              <Route path="/helplines" element={<Helplines />} />
+              <Route path="/safe-routes" element={<ProtectedRoute><SafeRoutes /></ProtectedRoute>} />
+              <Route path="/activity" element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </SettingsProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
