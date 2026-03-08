@@ -70,7 +70,7 @@ const Index = () => {
   // Voice detection
   const { listening, supported: voiceSupported } = useVoiceDetection({
     enabled: voiceEnabled,
-    onDistressDetected: handleSOSTrigger,
+    onDistressDetected: () => handleSOSTrigger("voice"),
     debounceMs: 5000,
   });
 
