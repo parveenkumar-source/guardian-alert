@@ -70,6 +70,16 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
       }
     };
     sendSMS();
+
+    // Also send push notification
+    if (pushSubscribed) {
+      sendPushToSelf(
+        "🚨 SOS Alert Sent",
+        location
+          ? `Emergency alert sent with your location. Stay safe.`
+          : "Emergency alert sent to your contacts."
+      );
+    }
   }, []);
 
   const openWhatsApp = (contact: Contact) => {
