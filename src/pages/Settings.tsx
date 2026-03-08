@@ -231,6 +231,13 @@ const SettingsPage = () => {
               checked={local.voice_detection}
               onChange={(v) => handleChange("voice_detection", v)}
             />
+            <ToggleRow
+              icon={<Hand className="w-4 h-4" />}
+              label="Triple-Tap SOS"
+              description="Tap screen 3 times quickly to trigger SOS"
+              checked={local.triple_tap_sos}
+              onChange={(v) => handleChange("triple_tap_sos", v)}
+            />
           </section>
 
           {/* Save Button */}
