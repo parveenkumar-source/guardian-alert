@@ -19,6 +19,7 @@ import ActivityLog from "./pages/ActivityLog";
 import SettingsPage from "./pages/Settings";
 import Evidence from "./pages/Evidence";
 import CommunityFeed from "./pages/CommunityFeed";
+import HotspotAnalytics from "./pages/HotspotAnalytics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -46,6 +47,7 @@ const AnimatedRoutes = () => {
         <Route path="/settings" element={<PageTransition><ProtectedRoute><SettingsPage /></ProtectedRoute></PageTransition>} />
         <Route path="/evidence" element={<PageTransition><ProtectedRoute><Evidence /></ProtectedRoute></PageTransition>} />
         <Route path="/community" element={<PageTransition><ProtectedRoute><CommunityFeed /></ProtectedRoute></PageTransition>} />
+        <Route path="/hotspots" element={<PageTransition><ProtectedRoute><HotspotAnalytics /></ProtectedRoute></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>

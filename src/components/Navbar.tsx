@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Shield, Users, Home, Phone, LogIn, LogOut, Navigation, FileText, Settings, MapPin, Camera, MessageSquare, Menu, X } from "lucide-react";
+import { Shield, Users, Home, Phone, LogIn, LogOut, Navigation, FileText, Settings, MapPin, Camera, MessageSquare, Menu, X, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
 
@@ -19,6 +19,7 @@ const Navbar = () => {
 
   const secondaryLinks = [
     { to: "/helplines", label: "Helplines", icon: Phone },
+    { to: "/hotspots", label: "Hotspots", icon: AlertTriangle },
     { to: "/activity", label: "Log", icon: FileText },
     { to: "/evidence", label: "Evidence", icon: Camera },
     { to: "/settings", label: "Settings", icon: Settings },
