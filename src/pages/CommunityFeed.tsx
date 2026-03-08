@@ -94,6 +94,29 @@ const CommunityFeed = () => {
 
   useEffect(() => {
     fetchReports();
+
+    // Real-time subscription for new/updated/deleted reports
+    const channel = supabase
+      .channel("community-feed")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "safety_reports" },
+        (payload) => {
+          setReports((prev) => [payload.new as Report, ...prev]);
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "safety_reports" },
+        (payload) => {
+          setReports((prev) => prev.filter((r) => r.id !== (payload.old as any).id));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [fetchReports]);
 
   useEffect(() => {
