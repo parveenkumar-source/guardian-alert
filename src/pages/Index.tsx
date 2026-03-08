@@ -29,6 +29,7 @@ const Index = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoRecording = useAutoRecording();
 
   const canTrigger = useCallback(async () => {
     if (sosState !== "idle") return false;
