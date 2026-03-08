@@ -244,6 +244,41 @@ export type Database = {
         }
         Relationships: []
       }
+      report_comments: {
+        Row: {
+          content: string
+          created_at: string
+          display_name: string
+          id: string
+          report_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          display_name?: string
+          id?: string
+          report_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          display_name?: string
+          id?: string
+          report_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_comments_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "safety_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       report_votes: {
         Row: {
           created_at: string

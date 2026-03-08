@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useToast } from "@/hooks/use-toast";
+import ReportComments from "@/components/ReportComments";
 import {
   MapPin, AlertTriangle, Shield, Eye, Flame, Moon, Car, Users,
   ThumbsUp, ThumbsDown, Loader2, Filter, Navigation,
@@ -53,6 +54,8 @@ const CommunityFeed = () => {
   const [userVotes, setUserVotes] = useState<Record<string, number>>({});
   const [voteCounts, setVoteCounts] = useState<Record<string, { up: number; down: number }>>({});
   const [votingId, setVotingId] = useState<string | null>(null);
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
+  const [openCommentId, setOpenCommentId] = useState<string | null>(null);
 
   useEffect(() => {
     getLocation();
@@ -119,9 +122,28 @@ const CommunityFeed = () => {
     };
   }, [fetchReports]);
 
+  const fetchCommentCounts = useCallback(async (ids: string[]) => {
+    if (ids.length === 0) return;
+    const { data } = await supabase
+      .from("report_comments")
+      .select("report_id")
+      .in("report_id", ids);
+    if (data) {
+      const counts: Record<string, number> = {};
+      for (const row of data) {
+        counts[row.report_id] = (counts[row.report_id] || 0) + 1;
+      }
+      setCommentCounts(counts);
+    }
+  }, []);
+
   useEffect(() => {
-    if (reports.length > 0) fetchVotes(reports.map((r) => r.id));
-  }, [reports, fetchVotes]);
+    if (reports.length > 0) {
+      const ids = reports.map((r) => r.id);
+      fetchVotes(ids);
+      fetchCommentCounts(ids);
+    }
+  }, [reports, fetchVotes, fetchCommentCounts]);
 
   const handleVote = async (reportId: string, voteType: number) => {
     if (!user) {
@@ -364,6 +386,13 @@ const CommunityFeed = () => {
                         Map
                       </a>
                     </div>
+                    {/* Comments */}
+                    <ReportComments
+                      reportId={report.id}
+                      isOpen={openCommentId === report.id}
+                      onToggle={() => setOpenCommentId(openCommentId === report.id ? null : report.id)}
+                      commentCount={commentCounts[report.id] || 0}
+                    />
                   </div>
                 </div>
               );
