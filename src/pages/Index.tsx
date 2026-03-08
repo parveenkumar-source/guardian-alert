@@ -147,12 +147,12 @@ const Index = () => {
               <button
                 onClick={toggleVoice}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all ${
-                  voiceEnabled
+                  settings.voice_detection
                     ? "bg-safe/15 text-safe border border-safe/30"
                     : "bg-secondary text-muted-foreground border border-border hover:text-foreground"
                 }`}
               >
-                {voiceEnabled ? (
+                {settings.voice_detection ? (
                   <>
                     <Mic className={`w-3.5 h-3.5 ${listening ? "animate-pulse" : ""}`} />
                     Voice {listening && "· Listening"}
