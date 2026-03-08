@@ -11,6 +11,7 @@ import Contacts from "./pages/Contacts";
 import Helplines from "./pages/Helplines";
 import Auth from "./pages/Auth";
 import SafeRoutes from "./pages/SafeRoutes";
+import SafetyMap from "./pages/SafetyMap";
 import ActivityLog from "./pages/ActivityLog";
 import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
               <Route path="/helplines" element={<Helplines />} />
               <Route path="/safe-routes" element={<ProtectedRoute><SafeRoutes /></ProtectedRoute>} />
+              <Route path="/safety-map" element={<ProtectedRoute><SafetyMap /></ProtectedRoute>} />
               <Route path="/activity" element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
