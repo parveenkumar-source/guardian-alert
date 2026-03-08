@@ -108,6 +108,9 @@ const Index = () => {
       {sosState === "activating" && <SOSActivation onCancel={handleSOSCancel} onConfirm={handleSOSConfirm} countdownSeconds={settings.countdown_seconds} />}
       {sosState === "confirmed" && <SOSConfirmed location={location} onDismiss={handleSOSDismiss} />}
       {sosState === "panic" && <PanicMode location={location} onExit={handlePanicExit} />}
+      {fakeCallActive && (
+        <FakeCall callerName="Mom" delay={fakeCallDelay} onEnd={() => setFakeCallActive(false)} key="fake-call" />
+      )}
 
       <section className="relative min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-4 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
@@ -194,16 +197,6 @@ const Index = () => {
             </button>
           </div>
 
-          {/* Fake Call Widget */}
-          {fakeCallActive && (
-            <div className="w-full max-w-xs">
-              <FakeCall
-                callerName="Mom"
-                delay={fakeCallDelay}
-                onEnd={() => setFakeCallActive(false)}
-              />
-            </div>
-          )}
 
           <div className="flex gap-3 w-full max-w-xs">
             <Link to="/contacts" className="flex-1 glass-card-hover p-3 flex flex-col items-center gap-1.5 text-center">

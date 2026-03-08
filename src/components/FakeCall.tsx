@@ -141,7 +141,7 @@ const FakeCall = ({ callerName = "Mom", delay = 5, onEnd }: FakeCallProps) => {
 
   // Full-screen call UI
   return (
-    <div className="fixed inset-0 z-[100] bg-background flex flex-col items-center justify-between py-16 px-6 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[200] bg-background flex flex-col items-center justify-center gap-16 px-6 animate-in fade-in duration-200 overflow-hidden" style={{ touchAction: "none" }}>
       {/* Caller info */}
       <div className="flex flex-col items-center gap-4 mt-12">
         <div className={`w-24 h-24 rounded-full bg-primary/15 flex items-center justify-center ${phase === "ringing" ? "animate-pulse" : ""}`}>
