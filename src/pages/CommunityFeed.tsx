@@ -122,9 +122,28 @@ const CommunityFeed = () => {
     };
   }, [fetchReports]);
 
+  const fetchCommentCounts = useCallback(async (ids: string[]) => {
+    if (ids.length === 0) return;
+    const { data } = await supabase
+      .from("report_comments")
+      .select("report_id")
+      .in("report_id", ids);
+    if (data) {
+      const counts: Record<string, number> = {};
+      for (const row of data) {
+        counts[row.report_id] = (counts[row.report_id] || 0) + 1;
+      }
+      setCommentCounts(counts);
+    }
+  }, []);
+
   useEffect(() => {
-    if (reports.length > 0) fetchVotes(reports.map((r) => r.id));
-  }, [reports, fetchVotes]);
+    if (reports.length > 0) {
+      const ids = reports.map((r) => r.id);
+      fetchVotes(ids);
+      fetchCommentCounts(ids);
+    }
+  }, [reports, fetchVotes, fetchCommentCounts]);
 
   const handleVote = async (reportId: string, voteType: number) => {
     if (!user) {
