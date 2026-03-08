@@ -23,6 +23,7 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
   const [whatsappSentTo, setWhatsappSentTo] = useState<Set<string>>(new Set());
   const { toast } = useToast();
   const { settings } = useSettings();
+  const { sendPushToSelf, subscribed: pushSubscribed } = usePushNotifications();
 
   const baseMessage = location
     ? generateSOSMessage(location.latitude, location.longitude)
