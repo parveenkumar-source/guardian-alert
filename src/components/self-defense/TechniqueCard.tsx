@@ -19,23 +19,25 @@ interface TechniqueCardProps {
 
 const TechniqueCard = ({ technique: tech, isOpen, onToggle }: TechniqueCardProps) => {
   return (
-    <div className="glass-card overflow-hidden">
+    <div className={`glass-card overflow-hidden transition-all duration-300 ${isOpen ? "ring-1 ring-primary/20 shadow-lg shadow-primary/5" : "hover:border-border/60"}`}>
       <button
         onClick={onToggle}
-        className="w-full p-4 flex items-center gap-3 text-left"
+        className="w-full p-4 flex items-center gap-3 text-left active:bg-secondary/30 transition-colors"
       >
-        <div className="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center shrink-0">
-          <tech.icon className={`w-4.5 h-4.5 ${tech.color}`} />
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${isOpen ? "bg-primary/15" : "bg-secondary"}`}>
+          <tech.icon className={`w-5 h-5 ${tech.color}`} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-foreground">{tech.title}</p>
-          <p className="text-[11px] text-muted-foreground truncate">{tech.situation}</p>
+          <p className="text-sm font-semibold text-foreground leading-tight">{tech.title}</p>
+          <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 truncate">{tech.situation}</p>
         </div>
-        {isOpen ? (
-          <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" />
-        ) : (
-          <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
-        )}
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+          className="shrink-0"
+        >
+          <ChevronDown className={`w-4 h-4 transition-colors ${isOpen ? "text-primary" : "text-muted-foreground"}`} />
+        </motion.div>
       </button>
 
       <AnimatePresence>
@@ -47,49 +49,52 @@ const TechniqueCard = ({ technique: tech, isOpen, onToggle }: TechniqueCardProps
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <div className="px-4 pb-4 space-y-3">
+            <div className="px-4 pb-4 space-y-4">
               {/* Illustration */}
               <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
+                initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.15, duration: 0.4, ease: "easeOut" }}
-                className="rounded-xl overflow-hidden border border-border/50"
+                transition={{ delay: 0.1, duration: 0.4, ease: "easeOut" }}
+                className="rounded-xl overflow-hidden border border-border/40 bg-secondary/30"
               >
                 <img
                   src={tech.image}
                   alt={`${tech.title} illustration`}
-                  className="w-full h-40 object-cover"
+                  className="w-full h-44 sm:h-52 object-cover"
                   loading="lazy"
                 />
               </motion.div>
 
               {/* Steps */}
-              <div className="space-y-2">
+              <div className="space-y-2.5">
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">
+                  Step-by-step
+                </p>
                 {tech.steps.map((step, si) => (
                   <motion.div
                     key={si}
-                    initial={{ x: -20, opacity: 0 }}
+                    initial={{ x: -16, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 + si * 0.08, duration: 0.3 }}
-                    className="flex items-start gap-2.5"
+                    transition={{ delay: 0.15 + si * 0.07, duration: 0.3 }}
+                    className="flex items-start gap-3 group"
                   >
-                    <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    <span className="w-6 h-6 rounded-lg bg-primary/10 text-primary text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-primary/20 transition-colors">
                       {si + 1}
                     </span>
-                    <p className="text-xs text-foreground leading-relaxed">{step}</p>
+                    <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed">{step}</p>
                   </motion.div>
                 ))}
               </div>
 
               {/* Pro Tip */}
               <motion.div
-                initial={{ y: 10, opacity: 0 }}
+                initial={{ y: 8, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5, duration: 0.3 }}
-                className="p-2.5 rounded-lg bg-primary/5 border border-primary/10"
+                className="p-3 rounded-xl bg-primary/5 border border-primary/10"
               >
-                <p className="text-[11px] text-primary font-medium">
-                  💡 Pro Tip: {tech.tip}
+                <p className="text-[11px] sm:text-xs text-primary font-medium leading-relaxed">
+                  💡 <span className="font-semibold">Pro Tip:</span> {tech.tip}
                 </p>
               </motion.div>
             </div>

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Shield, ChevronDown, ChevronUp, AlertTriangle, Zap, Hand, Target, ArrowLeft } from "lucide-react";
+import { Shield, AlertTriangle, Zap, Hand, Target, ArrowLeft, Search } from "lucide-react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 import wristGrabImg from "@/assets/self-defense/wrist-grab.png";
 import palmStrikeImg from "@/assets/self-defense/palm-strike.png";
@@ -125,82 +125,169 @@ const categories = [
 const SelfDefense = () => {
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
 
-  const filtered = filter === "all" ? techniques : techniques.filter((_, i) => {
-    if (filter === "grab") return [0, 3, 4].includes(i);
-    if (filter === "strike") return [1, 5].includes(i);
-    if (filter === "close") return [2, 3].includes(i);
-    return true;
+  const filtered = techniques.filter((tech, i) => {
+    const matchesFilter =
+      filter === "all" ||
+      (filter === "grab" && [0, 3, 4].includes(i)) ||
+      (filter === "strike" && [1, 5].includes(i)) ||
+      (filter === "close" && [2, 3].includes(i));
+
+    const matchesSearch =
+      !search ||
+      tech.title.toLowerCase().includes(search.toLowerCase()) ||
+      tech.situation.toLowerCase().includes(search.toLowerCase());
+
+    return matchesFilter && matchesSearch;
   });
 
   return (
-    <div className="min-h-screen pt-14 pb-20 md:pb-0">
-      <div className="px-4 py-6 max-w-lg mx-auto">
+    <div className="min-h-screen pt-14 pb-20 md:pb-6">
+      <div className="px-4 py-6 max-w-2xl mx-auto">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <Link to="/" className="p-2 rounded-lg bg-secondary text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="w-4 h-4" />
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="flex items-center gap-3 mb-5"
+        >
+          <Link
+            to="/"
+            className="p-2.5 rounded-xl bg-secondary/80 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all active:scale-95"
+          >
+            <ArrowLeft className="w-4.5 h-4.5" />
           </Link>
-          <div>
-            <h1 className="font-display text-xl font-bold text-foreground">Self-Defense Guide</h1>
-            <p className="text-xs text-muted-foreground">Quick techniques for emergency situations</p>
-          </div>
-        </div>
-
-        {/* Important disclaimer */}
-        <div className="glass-card p-3 mb-4 border-l-4 border-l-amber-500">
-          <div className="flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
-            <p className="text-[11px] text-muted-foreground leading-relaxed">
-              <strong className="text-foreground">Important:</strong> These are basic awareness techniques. Your safety is the priority — always try to escape and call for help first. Consider professional self-defense training for hands-on practice.
+          <div className="flex-1">
+            <h1 className="font-display text-xl sm:text-2xl font-bold text-foreground">
+              Self-Defense Guide
+            </h1>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Quick techniques for emergency situations
             </p>
           </div>
-        </div>
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
+            <Shield className="w-3.5 h-3.5 text-primary" />
+            <span className="text-[11px] font-medium text-primary">{techniques.length} Techniques</span>
+          </div>
+        </motion.div>
+
+        {/* Disclaimer */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
+          className="glass-card p-3.5 mb-5 border-l-4 border-l-amber-500"
+        >
+          <div className="flex items-start gap-2.5">
+            <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
+            <p className="text-[11px] sm:text-xs text-muted-foreground leading-relaxed">
+              <strong className="text-foreground">Important:</strong> These are basic awareness techniques.
+              Your safety is the priority — always try to escape and call for help first.
+              Consider professional self-defense training for hands-on practice.
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Search */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.4 }}
+          className="relative mb-4"
+        >
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search techniques..."
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-secondary/60 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/40 focus:bg-secondary/80 transition-all"
+          />
+        </motion.div>
 
         {/* Filters */}
-        <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.4 }}
+          className="flex gap-2 mb-5 overflow-x-auto pb-1 scrollbar-none"
+        >
           {categories.map((cat) => (
             <button
               key={cat.value}
               onClick={() => setFilter(cat.value)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+              className={`px-4 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all active:scale-95 ${
                 filter === cat.value
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-muted-foreground hover:text-foreground"
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                  : "bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary border border-border/30"
               }`}
             >
               {cat.label}
             </button>
           ))}
-        </div>
+        </motion.div>
 
-        {/* Techniques */}
-        <div className="space-y-2.5">
-          {filtered.map((tech) => {
+        {/* Techniques Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {filtered.map((tech, i) => {
             const realIdx = techniques.indexOf(tech);
             const isOpen = expandedIdx === realIdx;
 
             return (
-              <TechniqueCard
+              <motion.div
                 key={tech.title}
-                technique={tech}
-                isOpen={isOpen}
-                onToggle={() => setExpandedIdx(isOpen ? null : realIdx)}
-              />
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 + i * 0.06, duration: 0.4 }}
+                className={isOpen ? "sm:col-span-2" : ""}
+              >
+                <TechniqueCard
+                  technique={tech}
+                  isOpen={isOpen}
+                  onToggle={() => setExpandedIdx(isOpen ? null : realIdx)}
+                />
+              </motion.div>
             );
           })}
         </div>
 
+        {/* Empty state */}
+        {filtered.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-12"
+          >
+            <Search className="w-8 h-8 text-muted-foreground/40 mx-auto mb-3" />
+            <p className="text-sm text-muted-foreground">No techniques found</p>
+            <button
+              onClick={() => { setSearch(""); setFilter("all"); }}
+              className="mt-2 text-xs text-primary hover:underline"
+            >
+              Clear filters
+            </button>
+          </motion.div>
+        )}
+
         {/* Emergency reminder */}
-        <div className="mt-6 text-center space-y-2">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.4 }}
+          className="mt-8 glass-card p-5 text-center space-y-3"
+        >
           <p className="text-xs text-muted-foreground">In case of emergency, always call</p>
           <a
             href="tel:112"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-destructive text-white text-sm font-semibold hover:bg-destructive/90 transition-colors"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-destructive text-destructive-foreground text-sm font-semibold hover:bg-destructive/90 transition-all active:scale-95 shadow-lg shadow-destructive/20"
           >
             📞 Call 112
           </a>
-        </div>
+          <p className="text-[10px] text-muted-foreground/60">
+            Your safety is always the first priority
+          </p>
+        </motion.div>
       </div>
     </div>
   );
