@@ -386,6 +386,13 @@ const CommunityFeed = () => {
                         Map
                       </a>
                     </div>
+                    {/* Comments */}
+                    <ReportComments
+                      reportId={report.id}
+                      isOpen={openCommentId === report.id}
+                      onToggle={() => setOpenCommentId(openCommentId === report.id ? null : report.id)}
+                      commentCount={commentCounts[report.id] || 0}
+                    />
                   </div>
                 </div>
               );
