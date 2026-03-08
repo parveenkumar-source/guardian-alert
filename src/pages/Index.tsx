@@ -16,7 +16,7 @@ import { logSOSTrigger, TriggerType } from "@/lib/activityLog";
 import { useSettings } from "@/hooks/useSettings";
 
 const Index = () => {
-  const { settings } = useSettings();
+  const { settings, updateSettings } = useSettings();
   const [sosState, setSosState] = useState<"idle" | "activating" | "confirmed" | "panic">("idle");
   const { location, getLocation } = useGeolocation();
   const { toast } = useToast();
