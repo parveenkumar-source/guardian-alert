@@ -321,7 +321,7 @@ const SafetyMap = () => {
 
         {/* Map visualization using embedded Leaflet */}
         <Card className="overflow-hidden">
-          <div className="relative w-full h-[400px] bg-secondary">
+          <div className="relative w-full h-[280px] sm:h-[400px] bg-secondary">
             {mapCenter ? (
               <iframe
                 title="Safety Map"

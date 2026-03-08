@@ -207,7 +207,7 @@ const SafetyCheckin = () => {
             <X className="w-4 h-4" />
           </button>
         </div>
-        <div className="grid grid-cols-5 gap-2">
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
           {DURATION_OPTIONS.map((opt) => (
             <button
               key={opt.minutes}
