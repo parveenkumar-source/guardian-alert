@@ -57,6 +57,11 @@ const SOSActivation = ({ onCancel, onConfirm, countdownSeconds = 10 }: SOSActiva
           </p>
         </div>
 
+        <div className="flex items-center gap-2 text-xs text-safe">
+          <Mic className="w-3.5 h-3.5 animate-pulse" />
+          <span>Recording audio evidence…</span>
+        </div>
+
         <button
           onClick={onCancel}
           className="flex items-center gap-2 px-8 py-3 rounded-full bg-secondary hover:bg-secondary/80 text-foreground font-medium transition-colors"
