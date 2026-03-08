@@ -208,6 +208,38 @@ export type Database = {
         }
         Relationships: []
       }
+      report_votes: {
+        Row: {
+          created_at: string
+          id: string
+          report_id: string
+          user_id: string
+          vote_type: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          report_id: string
+          user_id: string
+          vote_type?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          report_id?: string
+          user_id?: string
+          vote_type?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_votes_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "safety_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       safety_checkins: {
         Row: {
           alert_sent: boolean
