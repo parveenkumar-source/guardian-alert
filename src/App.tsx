@@ -76,6 +76,7 @@ const App = () => (
           <BrowserRouter>
             <Navbar />
             <AnimatedRoutes />
+            <FloatingSOSWidget />
           </BrowserRouter>
         </SettingsProvider>
       </AuthProvider>
