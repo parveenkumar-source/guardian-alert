@@ -55,7 +55,16 @@ const EmergencyInfoCard = () => {
     if (!user) return;
     setSaving(true);
 
-    const payload = { ...form, user_id: user.id };
+    const payload = {
+      full_name: form.full_name || null,
+      blood_type: form.blood_type || null,
+      allergies: form.allergies || null,
+      medical_conditions: form.medical_conditions || null,
+      medications: form.medications || null,
+      emergency_notes: form.emergency_notes || null,
+      date_of_birth: form.date_of_birth || null,
+      user_id: user.id,
+    };
     let error;
 
     if (info) {
