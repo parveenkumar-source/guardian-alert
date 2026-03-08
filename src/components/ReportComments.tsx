@@ -113,6 +113,7 @@ const ReportComments = ({ reportId, isOpen, onToggle, commentCount }: ReportComm
   };
 
   const handleDelete = async (commentId: string) => {
+    setComments((prev) => prev.filter((c) => c.id !== commentId));
     await supabase.from("report_comments").delete().eq("id", commentId);
   };
 
