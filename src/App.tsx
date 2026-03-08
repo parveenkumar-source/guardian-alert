@@ -24,6 +24,8 @@ import HotspotAnalytics from "./pages/HotspotAnalytics";
 import AIChatbot from "./pages/AIChatbot";
 import IncidentReport from "./pages/IncidentReport";
 import ThreatAssessment from "./pages/ThreatAssessment";
+import SelfDefense from "./pages/SelfDefense";
+import FloatingSOSWidget from "./components/FloatingSOSWidget";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -55,6 +57,7 @@ const AnimatedRoutes = () => {
         <Route path="/ai-chat" element={<PageTransition><AIChatbot /></PageTransition>} />
         <Route path="/incident-report" element={<PageTransition><IncidentReport /></PageTransition>} />
         <Route path="/threat-assessment" element={<PageTransition><ThreatAssessment /></PageTransition>} />
+        <Route path="/self-defense" element={<PageTransition><SelfDefense /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
@@ -73,6 +76,7 @@ const App = () => (
           <BrowserRouter>
             <Navbar />
             <AnimatedRoutes />
+            <FloatingSOSWidget />
           </BrowserRouter>
         </SettingsProvider>
       </AuthProvider>
