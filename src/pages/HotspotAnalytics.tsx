@@ -88,6 +88,9 @@ const HotspotAnalytics = () => {
   const topHotspots = hotspots.slice(0, 10);
   const maxCount = topHotspots[0]?.count || 1;
 
+  const hotspotCoords = useMemo(() => topHotspots.map(h => ({ lat: h.lat, lng: h.lng })), [topHotspots]);
+  const { getName } = useReverseGeocode(hotspotCoords);
+
   const severityDistribution = useMemo(() => {
     const dist: Record<string, number> = {};
     for (const r of reports) {
