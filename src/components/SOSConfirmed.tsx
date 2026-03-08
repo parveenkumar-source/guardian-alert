@@ -21,10 +21,15 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
   const [smsSending, setSmsSending] = useState(false);
   const [whatsappSentTo, setWhatsappSentTo] = useState<Set<string>>(new Set());
   const { toast } = useToast();
+  const { settings } = useSettings();
 
-  const message = location
+  const baseMessage = location
     ? generateSOSMessage(location.latitude, location.longitude)
     : "🚨 EMERGENCY SOS ALERT! I need immediate help!";
+
+  const message = settings.custom_message
+    ? `${baseMessage}\n\n${settings.custom_message}`
+    : baseMessage;
 
   useEffect(() => {
     supabase
