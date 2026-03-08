@@ -324,7 +324,7 @@ const HotspotAnalytics = () => {
               <CardHeader className="p-3 pb-1">
                 <CardTitle className="text-sm flex items-center gap-1.5">
                   <MapPin className="w-4 h-4 text-destructive" />
-                  Top {Math.min(10, hotspots.length)} Sabse Khatarnak Areas
+                  Top {Math.min(10, hotspots.length)} Most Dangerous Areas
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-3 pt-2 space-y-2">
