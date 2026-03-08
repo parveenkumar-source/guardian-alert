@@ -13,10 +13,11 @@ import { useAuth } from "@/hooks/useAuth";
 import useShakeDetection from "@/hooks/useShakeDetection";
 import useVoiceDetection from "@/hooks/useVoiceDetection";
 import { logSOSTrigger, TriggerType } from "@/lib/activityLog";
+import { useSettings } from "@/hooks/useSettings";
 
 const Index = () => {
+  const { settings } = useSettings();
   const [sosState, setSosState] = useState<"idle" | "activating" | "confirmed" | "panic">("idle");
-  const [voiceEnabled, setVoiceEnabled] = useState(false);
   const { location, getLocation } = useGeolocation();
   const { toast } = useToast();
   const { user } = useAuth();
