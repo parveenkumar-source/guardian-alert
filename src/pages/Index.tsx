@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from "react";
+import useAutoRecording from "@/hooks/useAutoRecording";
 import { Shield, MapPin, Users, Bell, ChevronRight, Phone, Mic, MicOff, EyeOff, PhoneIncoming, KeyRound } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { generateSOSMessage } from "@/lib/contacts";
