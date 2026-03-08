@@ -320,6 +320,7 @@ export type Database = {
           notify_sms: boolean
           notify_whatsapp: boolean
           shake_detection: boolean
+          triple_tap_sos: boolean
           updated_at: string
           user_id: string
           voice_detection: boolean
@@ -334,6 +335,7 @@ export type Database = {
           notify_sms?: boolean
           notify_whatsapp?: boolean
           shake_detection?: boolean
+          triple_tap_sos?: boolean
           updated_at?: string
           user_id: string
           voice_detection?: boolean
@@ -348,6 +350,7 @@ export type Database = {
           notify_sms?: boolean
           notify_whatsapp?: boolean
           shake_detection?: boolean
+          triple_tap_sos?: boolean
           updated_at?: string
           user_id?: string
           voice_detection?: boolean

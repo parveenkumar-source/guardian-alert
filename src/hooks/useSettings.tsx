@@ -11,6 +11,7 @@ export interface UserSettings {
   voice_detection: boolean;
   fake_call_name: string;
   fake_call_delay: number;
+  triple_tap_sos: boolean;
 }
 
 const defaults: UserSettings = {
@@ -22,6 +23,7 @@ const defaults: UserSettings = {
   voice_detection: false,
   fake_call_name: "Mom",
   fake_call_delay: 5,
+  triple_tap_sos: true,
 };
 
 interface SettingsContextType {
@@ -67,6 +69,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
           voice_detection: data.voice_detection ?? false,
           fake_call_name: data.fake_call_name ?? "Mom",
           fake_call_delay: data.fake_call_delay ?? 5,
+          triple_tap_sos: data.triple_tap_sos ?? true,
         });
       }
       setLoading(false);

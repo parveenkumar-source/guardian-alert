@@ -80,10 +80,10 @@ const Index = () => {
     debounceMs: 5000,
   });
 
-  // Triple-tap discreet SOS trigger
+  // Triple-tap discreet SOS trigger — respects settings
   useTripleTap({
     onTripleTap: () => handleSOSTrigger("stealth"),
-    enabled: sosState === "idle",
+    enabled: sosState === "idle" && settings.triple_tap_sos,
   });
 
   const toggleVoice = async () => {

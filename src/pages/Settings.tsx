@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Settings, Clock, MessageSquare, Bell, Vibrate, Mic, Save, Check, BellRing, PhoneIncoming } from "lucide-react";
+import { Settings, Clock, MessageSquare, Bell, Vibrate, Mic, Save, Check, BellRing, PhoneIncoming, Hand } from "lucide-react";
 import { useSettings } from "@/hooks/useSettings";
 import { useToast } from "@/hooks/use-toast";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -230,6 +230,13 @@ const SettingsPage = () => {
               description='Say "Help" or "Bachao" to trigger SOS'
               checked={local.voice_detection}
               onChange={(v) => handleChange("voice_detection", v)}
+            />
+            <ToggleRow
+              icon={<Hand className="w-4 h-4" />}
+              label="Triple-Tap SOS"
+              description="Tap screen 3 times quickly to trigger SOS"
+              checked={local.triple_tap_sos}
+              onChange={(v) => handleChange("triple_tap_sos", v)}
             />
           </section>
 
