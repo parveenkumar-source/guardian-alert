@@ -21,6 +21,8 @@ import { useSettings } from "@/hooks/useSettings";
 const Index = () => {
   const { settings, updateSettings } = useSettings();
   const [sosState, setSosState] = useState<"idle" | "activating" | "confirmed" | "panic">("idle");
+  const [fakeCallActive, setFakeCallActive] = useState(false);
+  const [fakeCallDelay, setFakeCallDelay] = useState(5);
   const { location, getLocation } = useGeolocation();
   const { toast } = useToast();
   const { user } = useAuth();
