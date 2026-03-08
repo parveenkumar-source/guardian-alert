@@ -22,7 +22,6 @@ const Index = () => {
   const { settings, updateSettings } = useSettings();
   const [sosState, setSosState] = useState<"idle" | "activating" | "confirmed" | "panic">("idle");
   const [fakeCallActive, setFakeCallActive] = useState(false);
-  const [fakeCallDelay, setFakeCallDelay] = useState(5);
   const { location, getLocation } = useGeolocation();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -109,7 +108,7 @@ const Index = () => {
       {sosState === "confirmed" && <SOSConfirmed location={location} onDismiss={handleSOSDismiss} />}
       {sosState === "panic" && <PanicMode location={location} onExit={handlePanicExit} />}
       {fakeCallActive && (
-        <FakeCall callerName="Mom" delay={fakeCallDelay} onEnd={() => setFakeCallActive(false)} key="fake-call" />
+        <FakeCall callerName={settings.fake_call_name || "Mom"} delay={settings.fake_call_delay || 5} onEnd={() => setFakeCallActive(false)} key="fake-call" />
       )}
 
       <section className="relative min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-4 overflow-hidden">

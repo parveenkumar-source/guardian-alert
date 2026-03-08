@@ -314,6 +314,8 @@ export type Database = {
           countdown_seconds: number
           created_at: string
           custom_message: string | null
+          fake_call_delay: number | null
+          fake_call_name: string | null
           id: string
           notify_sms: boolean
           notify_whatsapp: boolean
@@ -326,6 +328,8 @@ export type Database = {
           countdown_seconds?: number
           created_at?: string
           custom_message?: string | null
+          fake_call_delay?: number | null
+          fake_call_name?: string | null
           id?: string
           notify_sms?: boolean
           notify_whatsapp?: boolean
@@ -338,6 +342,8 @@ export type Database = {
           countdown_seconds?: number
           created_at?: string
           custom_message?: string | null
+          fake_call_delay?: number | null
+          fake_call_name?: string | null
           id?: string
           notify_sms?: boolean
           notify_whatsapp?: boolean

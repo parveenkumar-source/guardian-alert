@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Settings, Clock, MessageSquare, Bell, Vibrate, Mic, Save, Check, BellRing } from "lucide-react";
+import { Settings, Clock, MessageSquare, Bell, Vibrate, Mic, Save, Check, BellRing, PhoneIncoming } from "lucide-react";
 import { useSettings } from "@/hooks/useSettings";
 import { useToast } from "@/hooks/use-toast";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -167,6 +167,47 @@ const SettingsPage = () => {
                 </button>
               </div>
             )}
+          </section>
+
+          {/* Fake Call */}
+          <section className="glass-card p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <PhoneIncoming className="w-4 h-4 text-primary" />
+              <h2 className="font-display font-semibold text-foreground">Fake Call</h2>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Customize the caller name and delay before the fake call rings.
+            </p>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">Caller Name</label>
+                <input
+                  value={local.fake_call_name}
+                  onChange={(e) => handleChange("fake_call_name", e.target.value.slice(0, 30))}
+                  placeholder="Mom"
+                  maxLength={30}
+                  className="w-full rounded-lg bg-secondary/50 border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">Delay (seconds)</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {[3, 5, 10, 15].map((sec) => (
+                    <button
+                      key={sec}
+                      onClick={() => handleChange("fake_call_delay", sec)}
+                      className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                        local.fake_call_delay === sec
+                          ? "bg-primary text-primary-foreground shadow-md"
+                          : "bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80"
+                      }`}
+                    >
+                      {sec}s
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </section>
 
           {/* Detection Preferences */}
