@@ -2,3 +2,6 @@ project_id = "vesarikimppomvxzfxxe"
 
 [functions.safety-tips]
 verify_jwt = false
+
+[functions.safe-routes]
+verify_jwt = false
