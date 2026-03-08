@@ -20,9 +20,11 @@ import useShakeDetection from "@/hooks/useShakeDetection";
 import useVoiceDetection from "@/hooks/useVoiceDetection";
 import { logSOSTrigger, TriggerType } from "@/lib/activityLog";
 import { useSettings } from "@/hooks/useSettings";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const Index = () => {
   const { settings, updateSettings } = useSettings();
+  const { t } = useLanguage();
   const [sosState, setSosState] = useState<"idle" | "activating" | "confirmed" | "panic">("idle");
   const [fakeCallActive, setFakeCallActive] = useState(false);
   const { location, getLocation } = useGeolocation();
@@ -34,16 +36,16 @@ const Index = () => {
   const canTrigger = useCallback(async () => {
     if (sosState !== "idle") return false;
     if (!user) {
-      toast({ title: "Please sign in first", description: "You need to be logged in to use SOS.", variant: "destructive" });
+      toast({ title: t("home_sign_in_first"), description: t("home_sign_in_sos"), variant: "destructive" });
       return false;
     }
     const { count } = await supabase.from("emergency_contacts").select("id", { count: "exact", head: true });
     if (!count || count === 0) {
-      toast({ title: "No Emergency Contacts", description: "Please add at least one emergency contact first.", variant: "destructive" });
+      toast({ title: t("home_no_contacts"), description: t("home_no_contacts_desc"), variant: "destructive" });
       return false;
     }
     return true;
-  }, [sosState, user, toast]);
+  }, [sosState, user, toast, t]);
 
   const handleSOSTrigger = useCallback(async (trigger: TriggerType = "manual") => {
     if (!(await canTrigger())) return;
@@ -92,8 +94,8 @@ const Index = () => {
     const newVal = !settings.voice_detection;
     if (newVal) {
       toast({
-        title: "Voice Detection Enabled",
-        description: 'Say "Help", "Bachao", or "SOS" to trigger an alert.',
+        title: t("home_voice_enabled"),
+        description: t("home_voice_enabled_desc"),
       });
     }
     await updateSettings({ voice_detection: newVal });
@@ -105,17 +107,17 @@ const Index = () => {
   const handlePanicExit = () => { autoRecording.clear(); setSosState("idle"); };
 
   const features = [
-    { icon: MapPin, title: "Live GPS Tracking", description: "Real-time location sharing with emergency contacts" },
-    { icon: Users, title: "Trusted Contacts", description: "Alert family and friends instantly with one tap" },
-    { icon: Bell, title: "Instant Alerts", description: "Automated SOS messages with location details" },
-    { icon: Shield, title: "Secure & Private", description: "End-to-end encrypted data, your privacy matters" },
+    { icon: MapPin, title: t("home_feature_gps_title"), description: t("home_feature_gps_desc") },
+    { icon: Users, title: t("home_feature_contacts_title"), description: t("home_feature_contacts_desc") },
+    { icon: Bell, title: t("home_feature_alerts_title"), description: t("home_feature_alerts_desc") },
+    { icon: Shield, title: t("home_feature_secure_title"), description: t("home_feature_secure_desc") },
   ];
 
   const quickActions = [
     ...(voiceSupported !== false
       ? [{
           icon: settings.voice_detection ? Mic : MicOff,
-          label: settings.voice_detection ? (listening ? "Listening…" : "Voice On") : "Voice SOS",
+          label: settings.voice_detection ? (listening ? t("home_listening") : t("home_voice_on")) : t("home_voice_sos"),
           onClick: toggleVoice,
           active: settings.voice_detection,
           activeClass: "bg-safe/15 text-safe border-safe/30",
@@ -124,7 +126,7 @@ const Index = () => {
       : []),
     {
       icon: EyeOff,
-      label: "Stealth",
+      label: t("home_stealth"),
       onClick: async () => {
         if (await canTrigger()) {
           getLocation();
@@ -138,7 +140,7 @@ const Index = () => {
     },
     {
       icon: PhoneIncoming,
-      label: "Fake Call",
+      label: t("home_fake_call"),
       onClick: () => setFakeCallActive(true),
       active: false,
       activeClass: "",
@@ -148,10 +150,10 @@ const Index = () => {
     ...(settings.safe_word
       ? [{
           icon: KeyRound,
-          label: "Safe Word",
+          label: t("home_safe_word"),
           onClick: async () => {
             if (!user) {
-              toast({ title: "Please sign in first", variant: "destructive" });
+              toast({ title: t("home_sign_in_first"), variant: "destructive" });
               return;
             }
             try {
@@ -159,12 +161,12 @@ const Index = () => {
                 body: { message: settings.safe_word },
               });
               toast({
-                title: error ? "Failed to send" : "Safe word sent",
-                description: error ? "Could not send safe word." : "Your code phrase was sent to all emergency contacts.",
+                title: error ? t("home_failed_to_send") : t("home_safe_word_sent"),
+                description: error ? t("home_could_not_send") : t("home_safe_word_sent_desc"),
                 variant: error ? "destructive" : "default",
               });
             } catch {
-              toast({ title: "Failed to send", variant: "destructive" });
+              toast({ title: t("home_failed_to_send"), variant: "destructive" });
             }
           },
           active: false,
@@ -185,31 +187,27 @@ const Index = () => {
 
       {/* Hero SOS Section */}
       <section className="relative min-h-[calc(100vh-8rem)] flex flex-col items-center justify-center px-4 overflow-hidden">
-        {/* Background glow */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px]" />
           <div className="absolute top-1/3 left-1/4 w-[200px] h-[200px] bg-primary/3 rounded-full blur-[80px]" />
         </div>
 
         <div className="relative z-10 flex flex-col items-center gap-6 max-w-md w-full page-transition">
-          {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium">
             <Shield className="w-3.5 h-3.5" />
-            AI-Powered Safety System
+            {t("home_badge")}
           </div>
 
-          {/* Headline */}
           <div className="text-center space-y-2">
             <h1 className="font-display text-4xl sm:text-5xl font-bold text-foreground leading-[1.1] tracking-tight">
-              Your Safety,<br />
-              <span className="text-gradient">One Tap Away</span>
+              {t("home_headline_1")}<br />
+              <span className="text-gradient">{t("home_headline_2")}</span>
             </h1>
             <p className="text-muted-foreground text-sm sm:text-base max-w-xs mx-auto leading-relaxed">
-              Instant SOS alerts with live location to your trusted contacts.
+              {t("home_subtitle")}
             </p>
           </div>
 
-          {/* SOS Button */}
           <div className="relative my-4">
             <div className="absolute inset-0 rounded-full bg-primary/20 sos-ring" />
             <div className="absolute inset-0 rounded-full bg-primary/15 sos-ring" style={{ animationDelay: "0.5s" }} />
@@ -224,9 +222,8 @@ const Index = () => {
               SOS
             </button>
           </div>
-          <p className="text-muted-foreground text-[11px] tracking-wide">TAP FOR SOS · LONG PRESS FOR STEALTH</p>
+          <p className="text-muted-foreground text-[11px] tracking-wide">{t("home_sos_hint")}</p>
 
-          {/* Quick Actions */}
           <div className="flex flex-wrap items-center justify-center gap-2">
             {quickActions.map((action, i) => (
               <button
@@ -245,23 +242,21 @@ const Index = () => {
             ))}
           </div>
 
-          {/* Quick Links */}
           <div className="flex gap-3 w-full max-w-xs">
             <Link to="/contacts" className="flex-1 glass-card-hover p-3.5 flex flex-col items-center gap-2 text-center">
               <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Users className="w-4.5 h-4.5 text-primary" />
               </div>
-              <span className="text-xs font-medium text-foreground">Contacts</span>
+              <span className="text-xs font-medium text-foreground">{t("home_contacts")}</span>
             </Link>
             <Link to="/helplines" className="flex-1 glass-card-hover p-3.5 flex flex-col items-center gap-2 text-center">
               <div className="w-9 h-9 rounded-lg bg-safe/10 flex items-center justify-center">
                 <Phone className="w-4.5 h-4.5 text-safe" />
               </div>
-              <span className="text-xs font-medium text-foreground">Helplines</span>
+              <span className="text-xs font-medium text-foreground">{t("home_helplines")}</span>
             </Link>
           </div>
 
-          {/* Safety Check-in & Journey */}
           <div className="w-full max-w-xs space-y-3">
             <SafetyCheckin />
             <JourneyTracker />
@@ -269,19 +264,17 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Safety Tips */}
       <section className="py-10 px-4">
         <div className="container mx-auto max-w-md">
           <SafetyTips location={location} />
         </div>
       </section>
 
-      {/* Features */}
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-3xl">
           <div className="text-center mb-10">
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-foreground mb-2">Safety Features</h2>
-            <p className="text-muted-foreground text-sm">Built with security and speed in mind</p>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-foreground mb-2">{t("home_safety_features")}</h2>
+            <p className="text-muted-foreground text-sm">{t("home_features_subtitle")}</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {features.map((feature, i) => (
@@ -300,11 +293,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="py-6 px-4 border-t border-border/30">
         <div className="container mx-auto text-center space-y-1">
-          <p className="text-xs text-muted-foreground">Raksha — AI-Based Women Safety & Emergency Alert System</p>
-          <p className="text-xs text-muted-foreground">In case of emergency, always call <span className="text-primary font-semibold">112</span></p>
+          <p className="text-xs text-muted-foreground">Raksha — {t("app_tagline")}</p>
+          <p className="text-xs text-muted-foreground">{t("home_emergency_call")} <span className="text-primary font-semibold">112</span></p>
         </div>
       </footer>
     </div>
