@@ -130,7 +130,7 @@ const HotspotAnalytics = () => {
       // Summary
       doc.setFontSize(14);
       doc.setTextColor(40);
-      doc.text("Top Sensitive Areas (Sabse Khatarnak Ilake)", 14, 52);
+      doc.text("Top Sensitive Areas", 14, 52);
 
       const tableData = topHotspots.map((h, i) => {
         const areaName = getName(h.lat, h.lng) || `${h.lat.toFixed(4)}, ${h.lng.toFixed(4)}`;
