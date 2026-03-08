@@ -376,7 +376,7 @@ const SafetyMap = () => {
             <CardHeader className="p-3 pb-1">
               <CardTitle className="text-sm flex items-center gap-2 text-destructive">
                 <TriangleAlert className="w-4 h-4" />
-                Danger Zones — Khatarnak Ilake
+                Danger Zones
                 <Link to="/hotspots" className="ml-auto text-[10px] font-normal text-primary hover:underline">
                   View Full Report →
                 </Link>
