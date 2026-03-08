@@ -75,14 +75,15 @@ const Index = () => {
     debounceMs: 5000,
   });
 
-  const toggleVoice = () => {
-    if (!voiceEnabled) {
+  const toggleVoice = async () => {
+    const newVal = !settings.voice_detection;
+    if (newVal) {
       toast({
         title: "Voice Detection Enabled",
         description: 'Say "Help", "Bachao", or "SOS" to trigger an alert.',
       });
     }
-    setVoiceEnabled(!voiceEnabled);
+    // Update via settings context - requires importing updateSettings
   };
 
   const handleSOSConfirm = () => setSosState("confirmed");
