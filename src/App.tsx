@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import { SettingsProvider } from "@/hooks/useSettings";
 import Navbar from "@/components/Navbar";
 import Index from "./pages/Index";
 import Contacts from "./pages/Contacts";
@@ -11,6 +12,7 @@ import Helplines from "./pages/Helplines";
 import Auth from "./pages/Auth";
 import SafeRoutes from "./pages/SafeRoutes";
 import ActivityLog from "./pages/ActivityLog";
+import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
