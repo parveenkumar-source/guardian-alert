@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Camera, Mic, Trash2, Download, Loader2, FileAudio, Image as ImageIcon } from "lucide-react";
+import { Camera, Mic, Trash2, Download, Loader2, FileAudio, Image as ImageIcon, Archive } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import JSZip from "jszip";
 
 interface EvidenceRecord {
   id: string;
@@ -21,6 +22,7 @@ const Evidence = () => {
   const [records, setRecords] = useState<EvidenceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -68,6 +70,58 @@ const Evidence = () => {
     }
   };
 
+  const handleExportAll = async () => {
+    if (records.length === 0) return;
+    setExporting(true);
+    try {
+      const zip = new JSZip();
+
+      // Add a metadata summary
+      const summary = records.map((r) => ({
+        file_type: r.file_type,
+        trigger: r.sos_trigger_type,
+        date: r.created_at,
+        duration_seconds: r.duration_seconds,
+        latitude: r.latitude,
+        longitude: r.longitude,
+      }));
+      zip.file("evidence_summary.json", JSON.stringify(summary, null, 2));
+
+      // Download and add each file
+      for (let i = 0; i < records.length; i++) {
+        const record = records[i];
+        try {
+          const { data, error } = await supabase.storage
+            .from("evidence")
+            .download(record.file_path);
+          if (error || !data) continue;
+          const ext = record.file_type === "audio" ? "webm" : "jpg";
+          const date = new Date(record.created_at).toISOString().replace(/[:.]/g, "-");
+          zip.file(`${i + 1}_${record.file_type}_${date}.${ext}`, data);
+        } catch {
+          // skip failed files
+        }
+      }
+
+      const blob = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `raksha-evidence-${new Date().toISOString().slice(0, 10)}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({ title: "Evidence exported", description: `${records.length} file(s) packaged into ZIP.` });
+    } catch (err: any) {
+      console.error("Export error:", err);
+      toast({ title: "Export failed", description: err.message, variant: "destructive" });
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleString(undefined, {
       month: "short", day: "numeric", year: "numeric",
@@ -99,6 +153,25 @@ const Evidence = () => {
           </div>
         ) : (
           <div className="space-y-3">
+            {/* Export All button */}
+            <button
+              onClick={handleExportAll}
+              disabled={exporting}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-primary text-primary-foreground font-medium text-sm transition-all hover:bg-primary/90 disabled:opacity-50"
+            >
+              {exporting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Packaging {records.length} files…
+                </>
+              ) : (
+                <>
+                  <Archive className="w-4 h-4" />
+                  Export All as ZIP ({records.length} files)
+                </>
+              )}
+            </button>
+
             {records.map((record) => (
               <div key={record.id} className="glass-card p-4 flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
