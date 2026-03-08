@@ -1,37 +1,39 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Shield, Users, Home, Phone, LogIn, LogOut, Navigation, FileText, Settings, MapPin, Camera, MessageSquare, Menu, X, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/hooks/useLanguage";
+import LanguageToggle from "@/components/LanguageToggle";
 import { useState } from "react";
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const mainLinks = [
-    { to: "/", label: "Home", icon: Home },
-    { to: "/safe-routes", label: "Routes", icon: Navigation },
-    { to: "/safety-map", label: "Map", icon: MapPin },
-    { to: "/community", label: "Feed", icon: MessageSquare },
-    { to: "/contacts", label: "Contacts", icon: Users },
+    { to: "/", label: t("nav_home"), icon: Home },
+    { to: "/safe-routes", label: t("nav_routes"), icon: Navigation },
+    { to: "/safety-map", label: t("nav_map"), icon: MapPin },
+    { to: "/community", label: t("nav_feed"), icon: MessageSquare },
+    { to: "/contacts", label: t("nav_contacts"), icon: Users },
   ];
 
   const secondaryLinks = [
-    { to: "/helplines", label: "Helplines", icon: Phone },
-    { to: "/hotspots", label: "Hotspots", icon: AlertTriangle },
-    { to: "/activity", label: "Log", icon: FileText },
-    { to: "/evidence", label: "Evidence", icon: Camera },
-    { to: "/settings", label: "Settings", icon: Settings },
+    { to: "/helplines", label: t("nav_helplines"), icon: Phone },
+    { to: "/hotspots", label: t("nav_hotspots"), icon: AlertTriangle },
+    { to: "/activity", label: t("nav_log"), icon: FileText },
+    { to: "/evidence", label: t("nav_evidence"), icon: Camera },
+    { to: "/settings", label: t("nav_settings"), icon: Settings },
   ];
 
-  // Bottom nav shows the 5 most important links on mobile
   const bottomNavLinks = [
-    { to: "/", label: "Home", icon: Home },
-    { to: "/safety-map", label: "Map", icon: MapPin },
-    { to: "/community", label: "Feed", icon: MessageSquare },
-    { to: "/contacts", label: "Contacts", icon: Users },
-    { to: "/settings", label: "More", icon: Menu },
+    { to: "/", label: t("nav_home"), icon: Home },
+    { to: "/safety-map", label: t("nav_map"), icon: MapPin },
+    { to: "/community", label: t("nav_feed"), icon: MessageSquare },
+    { to: "/contacts", label: t("nav_contacts"), icon: Users },
+    { to: "/settings", label: t("nav_more"), icon: Menu, isMore: true },
   ];
 
   const handleSignOut = async () => {
@@ -69,12 +71,13 @@ const Navbar = () => {
             ))}
 
             <div className="w-px h-6 bg-border mx-1" />
+            <LanguageToggle />
 
             {user ? (
               <button onClick={handleSignOut}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-all">
                 <LogOut className="w-3.5 h-3.5" />
-                Sign Out
+                {t("sign_out")}
               </button>
             ) : (
               <Link to="/auth"
@@ -84,13 +87,14 @@ const Navbar = () => {
                     : "bg-primary/10 text-primary hover:bg-primary/20"
                 }`}>
                 <LogIn className="w-3.5 h-3.5" />
-                Sign In
+                {t("sign_in")}
               </Link>
             )}
           </div>
 
-          {/* Mobile: auth button + hamburger */}
-          <div className="flex md:hidden items-center gap-2">
+          {/* Mobile: lang toggle + auth button */}
+          <div className="flex md:hidden items-center gap-1">
+            <LanguageToggle />
             {user ? (
               <button onClick={handleSignOut}
                 className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all">
@@ -100,7 +104,7 @@ const Navbar = () => {
               <Link to="/auth"
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-all">
                 <LogIn className="w-3.5 h-3.5" />
-                Sign In
+                {t("sign_in")}
               </Link>
             )}
           </div>
@@ -111,8 +115,8 @@ const Navbar = () => {
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
         <div className="glass-card border-t border-border/50 rounded-none px-2 pb-[env(safe-area-inset-bottom)]">
           <div className="flex items-center justify-around h-14">
-            {bottomNavLinks.map(({ to, label, icon: Icon }) => {
-              if (label === "More") {
+            {bottomNavLinks.map((item) => {
+              if (item.isMore) {
                 return (
                   <button
                     key="more"
@@ -121,22 +125,22 @@ const Navbar = () => {
                       mobileMenuOpen ? "text-primary" : "text-muted-foreground"
                     }`}
                   >
-                    {mobileMenuOpen ? <X className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
-                    <span className="text-[10px] font-medium">{mobileMenuOpen ? "Close" : label}</span>
+                    {mobileMenuOpen ? <X className="w-5 h-5" /> : <item.icon className="w-5 h-5" />}
+                    <span className="text-[10px] font-medium">{mobileMenuOpen ? t("close") : item.label}</span>
                   </button>
                 );
               }
               return (
-                <Link key={to} to={to}
+                <Link key={item.to} to={item.to}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-lg transition-all ${
-                    isActive(to)
+                    isActive(item.to)
                       ? "text-primary"
                       : "text-muted-foreground active:text-foreground"
                   }`}>
-                  <Icon className={`w-5 h-5 ${isActive(to) ? "drop-shadow-[0_0_6px_hsl(var(--primary)/0.5)]" : ""}`} />
-                  <span className="text-[10px] font-medium">{label}</span>
-                  {isActive(to) && <div className="absolute -bottom-0.5 w-5 h-0.5 rounded-full bg-primary" />}
+                  <item.icon className={`w-5 h-5 ${isActive(item.to) ? "drop-shadow-[0_0_6px_hsl(var(--primary)/0.5)]" : ""}`} />
+                  <span className="text-[10px] font-medium">{item.label}</span>
+                  {isActive(item.to) && <div className="absolute -bottom-0.5 w-5 h-0.5 rounded-full bg-primary" />}
                 </Link>
               );
             })}

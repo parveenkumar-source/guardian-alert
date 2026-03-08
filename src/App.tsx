@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { SettingsProvider } from "@/hooks/useSettings";
 import { ThemeProvider } from "@/hooks/useTheme";
+import { LanguageProvider } from "@/hooks/useLanguage";
 import { AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import PageTransition from "@/components/PageTransition";
@@ -58,6 +59,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <ThemeProvider>
+      <LanguageProvider>
       <AuthProvider>
         <SettingsProvider>
           <Toaster />
@@ -68,6 +70,7 @@ const App = () => (
           </BrowserRouter>
         </SettingsProvider>
       </AuthProvider>
+      </LanguageProvider>
       </ThemeProvider>
     </TooltipProvider>
   </QueryClientProvider>
