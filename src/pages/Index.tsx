@@ -192,6 +192,11 @@ const Index = () => {
               <span className="text-xs font-medium text-foreground">Helplines</span>
             </Link>
           </div>
+
+          {/* Safety Check-in */}
+          <div className="w-full max-w-xs">
+            <SafetyCheckin />
+          </div>
         </div>
       </section>
 
