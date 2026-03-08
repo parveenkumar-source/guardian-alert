@@ -89,6 +89,74 @@ export type Database = {
         }
         Relationships: []
       }
+      journey_points: {
+        Row: {
+          id: string
+          journey_id: string
+          latitude: number
+          longitude: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: string
+          journey_id: string
+          latitude: number
+          longitude: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: string
+          journey_id?: string
+          latitude?: number
+          longitude?: number
+          recorded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journey_points_journey_id_fkey"
+            columns: ["journey_id"]
+            isOneToOne: false
+            referencedRelation: "journeys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journeys: {
+        Row: {
+          destination_lat: number | null
+          destination_lng: number | null
+          destination_name: string
+          ended_at: string | null
+          id: string
+          is_active: boolean
+          share_token: string
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          destination_lat?: number | null
+          destination_lng?: number | null
+          destination_name?: string
+          ended_at?: string | null
+          id?: string
+          is_active?: boolean
+          share_token?: string
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          destination_lat?: number | null
+          destination_lng?: number | null
+          destination_name?: string
+          ended_at?: string | null
+          id?: string
+          is_active?: boolean
+          share_token?: string
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
