@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import useShakeDetection from "@/hooks/useShakeDetection";
 import useVoiceDetection from "@/hooks/useVoiceDetection";
+import { logSOSTrigger, TriggerType } from "@/lib/activityLog";
 
 const Index = () => {
   const [sosState, setSosState] = useState<"idle" | "activating" | "confirmed" | "panic">("idle");
