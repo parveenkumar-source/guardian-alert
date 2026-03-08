@@ -284,6 +284,36 @@ const CommunityFeed = () => {
               ))}
             </div>
           </div>
+
+          <div>
+            <p className="text-xs text-muted-foreground mb-1.5">Category</p>
+            <div className="flex flex-wrap gap-1.5">
+              {Object.entries(CATEGORIES).map(([key, { label, icon: CatIcon }]) => (
+                <button
+                  key={key}
+                  onClick={() => toggleCategory(key)}
+                  className={`inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    selectedCategories.has(key)
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : selectedCategories.size === 0
+                      ? "bg-secondary text-muted-foreground hover:text-foreground"
+                      : "bg-secondary/50 text-muted-foreground/60 hover:text-foreground hover:bg-secondary"
+                  }`}
+                >
+                  <CatIcon className="w-3 h-3" />
+                  {label}
+                </button>
+              ))}
+              {selectedCategories.size > 0 && (
+                <button
+                  onClick={() => setSelectedCategories(new Set())}
+                  className="px-2 py-1.5 rounded-lg text-xs font-medium text-destructive hover:bg-destructive/10 transition-all"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Feed */}
