@@ -18,11 +18,12 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  // Skip non-GET and API calls
+  // Skip non-GET, API calls, and OAuth redirects
   if (
     event.request.method !== "GET" ||
     event.request.url.includes("/functions/") ||
-    event.request.url.includes("supabase")
+    event.request.url.includes("supabase") ||
+    event.request.url.includes("/~oauth")
   ) {
     return;
   }

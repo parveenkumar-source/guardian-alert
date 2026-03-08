@@ -155,7 +155,7 @@ const ReportComments = ({ reportId, isOpen, onToggle, commentCount }: ReportComm
                       {user && c.user_id === user.id && (
                         <button
                           onClick={() => handleDelete(c.id)}
-                          className="ml-auto opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all"
+                          className="ml-auto opacity-100 sm:opacity-0 sm:group-hover:opacity-100 p-1 -m-1 text-muted-foreground hover:text-destructive transition-all"
                           aria-label="Delete comment"
                         >
                           <Trash2 className="w-3 h-3" />

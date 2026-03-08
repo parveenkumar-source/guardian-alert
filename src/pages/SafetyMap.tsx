@@ -237,13 +237,13 @@ const SafetyMap = () => {
     <div className="min-h-screen bg-background pt-16 pb-24 md:pb-8 px-4 page-transition">
       <div className="container mx-auto max-w-4xl space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2">
-              <MapPin className="w-6 h-6 text-primary" />
+            <h1 className="text-xl sm:text-2xl font-display font-bold text-foreground flex items-center gap-2">
+              <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
               Community Safety Map
             </h1>
-            <p className="text-muted-foreground text-sm mt-1">
+            <p className="text-muted-foreground text-xs sm:text-sm mt-1">
               Report and view unsafe areas in your community
             </p>
           </div>
@@ -253,7 +253,7 @@ const SafetyMap = () => {
               if (!location) getLocation();
             }}
             variant={showForm ? "outline" : "default"}
-            className="gap-2"
+            className="gap-2 w-full sm:w-auto"
           >
             {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             {showForm ? "Cancel" : "Report Area"}
@@ -273,7 +273,7 @@ const SafetyMap = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Category</Label>
                   <Select value={category} onValueChange={setCategory}>
@@ -321,7 +321,7 @@ const SafetyMap = () => {
 
         {/* Map visualization using embedded Leaflet */}
         <Card className="overflow-hidden">
-          <div className="relative w-full h-[400px] bg-secondary">
+          <div className="relative w-full h-[280px] sm:h-[400px] bg-secondary">
             {mapCenter ? (
               <iframe
                 title="Safety Map"
