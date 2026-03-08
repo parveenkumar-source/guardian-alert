@@ -146,7 +146,7 @@ const HotspotAnalytics = () => {
 
       autoTable(doc, {
         startY: 56,
-        head: [["Rank", "Location (Lat,Lng)", "Google Maps Link", "Total Incidents", "Categories", "Severity"]],
+        head: [["Rank", "Area Name", "Google Maps Link", "Total Incidents", "Categories", "Severity"]],
         body: tableData,
         styles: { fontSize: 7, cellPadding: 2 },
         headStyles: { fillColor: [200, 40, 60], textColor: [255, 255, 255] },
