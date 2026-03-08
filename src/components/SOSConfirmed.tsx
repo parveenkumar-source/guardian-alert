@@ -29,9 +29,37 @@ const SOSConfirmed = ({ location, onDismiss, autoRecording }: SOSConfirmedProps)
   const [smsSent, setSmsSent] = useState(false);
   const [smsSending, setSmsSending] = useState(false);
   const [whatsappSentTo, setWhatsappSentTo] = useState<Set<string>>(new Set());
+  const [autoRecordingSaved, setAutoRecordingSaved] = useState(false);
   const { toast } = useToast();
   const { settings } = useSettings();
+  const { user } = useAuth();
   const { sendPushToSelf, subscribed: pushSubscribed } = usePushNotifications();
+
+  // Auto-upload the pre-recorded audio
+  useEffect(() => {
+    if (!autoRecording || !user || autoRecordingSaved) return;
+    const upload = async () => {
+      try {
+        const ts = Date.now();
+        const filePath = `${user.id}/${ts}_audio.webm`;
+        await supabase.storage.from("evidence").upload(filePath, autoRecording.blob, { contentType: "audio/webm" });
+        await (supabase.from("evidence_recordings" as any) as any).insert({
+          user_id: user.id,
+          sos_trigger_type: "auto",
+          file_type: "audio",
+          file_path: filePath,
+          latitude: location?.latitude ?? null,
+          longitude: location?.longitude ?? null,
+          duration_seconds: autoRecording.duration,
+        });
+        setAutoRecordingSaved(true);
+        toast({ title: "Auto-recording saved", description: `${autoRecording.duration}s audio evidence stored securely.` });
+      } catch (err: any) {
+        console.error("Auto-recording upload error:", err);
+      }
+    };
+    upload();
+  }, [autoRecording, user]);
 
   const baseMessage = location
     ? generateSOSMessage(location.latitude, location.longitude)
