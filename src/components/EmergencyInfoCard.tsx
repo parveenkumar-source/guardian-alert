@@ -27,10 +27,10 @@ const EmergencyInfoCard = () => {
     queryKey: ["emergency-info", user?.id],
     queryFn: async () => {
       const { data } = await supabase
-        .from("emergency_info" as any)
+        .from("emergency_info")
         .select("*")
         .eq("user_id", user!.id)
-        .maybeSingle() as any;
+        .maybeSingle();
       return data ?? null;
     },
     enabled: !!user,
