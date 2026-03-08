@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { X } from "lucide-react";
+import { X, Mic } from "lucide-react";
 
 interface SOSActivationProps {
   onCancel: () => void;
@@ -55,6 +55,11 @@ const SOSActivation = ({ onCancel, onConfirm, countdownSeconds = 10 }: SOSActiva
           <p className="text-muted-foreground text-sm">
             Alert will be sent to your emergency contacts with your live location.
           </p>
+        </div>
+
+        <div className="flex items-center gap-2 text-xs text-safe">
+          <Mic className="w-3.5 h-3.5 animate-pulse" />
+          <span>Recording audio evidence…</span>
         </div>
 
         <button

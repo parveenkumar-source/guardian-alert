@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from "react";
+import useAutoRecording from "@/hooks/useAutoRecording";
 import { Shield, MapPin, Users, Bell, ChevronRight, Phone, Mic, MicOff, EyeOff, PhoneIncoming, KeyRound } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { generateSOSMessage } from "@/lib/contacts";
@@ -28,6 +29,7 @@ const Index = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoRecording = useAutoRecording();
 
   const canTrigger = useCallback(async () => {
     if (sosState !== "idle") return false;
@@ -47,8 +49,9 @@ const Index = () => {
     if (!(await canTrigger())) return;
     getLocation();
     setSosState("activating");
+    autoRecording.start();
     logSOSTrigger(trigger, location);
-  }, [canTrigger, getLocation, location]);
+  }, [canTrigger, getLocation, location, autoRecording]);
 
   // Long press SOS button → panic mode
   const handleSOSPointerDown = () => {
@@ -101,10 +104,22 @@ const Index = () => {
     await updateSettings({ voice_detection: newVal });
   };
 
-  const handleSOSConfirm = () => setSosState("confirmed");
-  const handleSOSCancel = () => setSosState("idle");
-  const handleSOSDismiss = () => setSosState("idle");
-  const handlePanicExit = () => setSosState("idle");
+  const handleSOSConfirm = () => {
+    autoRecording.stop();
+    setSosState("confirmed");
+  };
+  const handleSOSCancel = () => {
+    autoRecording.clear();
+    setSosState("idle");
+  };
+  const handleSOSDismiss = () => {
+    autoRecording.clear();
+    setSosState("idle");
+  };
+  const handlePanicExit = () => {
+    autoRecording.clear();
+    setSosState("idle");
+  };
 
   const features = [
     { icon: MapPin, title: "Live GPS Tracking", description: "Real-time location sharing with emergency contacts" },
@@ -116,7 +131,7 @@ const Index = () => {
   return (
     <div className="min-h-screen pt-16">
       {sosState === "activating" && <SOSActivation onCancel={handleSOSCancel} onConfirm={handleSOSConfirm} countdownSeconds={settings.countdown_seconds} />}
-      {sosState === "confirmed" && <SOSConfirmed location={location} onDismiss={handleSOSDismiss} />}
+      {sosState === "confirmed" && <SOSConfirmed location={location} onDismiss={handleSOSDismiss} autoRecording={autoRecording.result} />}
       {sosState === "panic" && <PanicMode location={location} onExit={handlePanicExit} />}
       {fakeCallActive && (
         <FakeCall callerName={settings.fake_call_name || "Mom"} delay={settings.fake_call_delay || 5} onEnd={() => setFakeCallActive(false)} key="fake-call" />
