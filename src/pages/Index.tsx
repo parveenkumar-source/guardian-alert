@@ -49,8 +49,9 @@ const Index = () => {
     if (!(await canTrigger())) return;
     getLocation();
     setSosState("activating");
+    autoRecording.start();
     logSOSTrigger(trigger, location);
-  }, [canTrigger, getLocation, location]);
+  }, [canTrigger, getLocation, location, autoRecording]);
 
   // Long press SOS button → panic mode
   const handleSOSPointerDown = () => {
