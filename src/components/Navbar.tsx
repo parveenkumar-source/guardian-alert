@@ -12,6 +12,7 @@ const Navbar = () => {
     { to: "/safe-routes", label: "Routes", icon: Navigation },
     { to: "/contacts", label: "Contacts", icon: Users },
     { to: "/helplines", label: "Helplines", icon: Phone },
+    { to: "/activity", label: "Log", icon: FileText },
   ];
 
   const handleSignOut = async () => {
