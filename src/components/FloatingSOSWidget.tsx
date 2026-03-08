@@ -35,7 +35,9 @@ const FloatingSOSWidget = () => {
         return;
       }
 
-      const message = generateSOSMessage(location, user.email);
+      const message = location
+        ? generateSOSMessage(location.latitude, location.longitude, user.email?.split("@")[0])
+        : `🚨 EMERGENCY SOS ALERT! I need immediate help! Location unavailable.`;
 
       for (const contact of contacts) {
         try {
