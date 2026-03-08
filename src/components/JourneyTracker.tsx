@@ -10,6 +10,7 @@ const TRACK_INTERVAL_MS = 15000; // 15 seconds
 const JourneyTracker = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [journey, setJourney] = useState<{
     id: string;
     share_token: string;
@@ -23,27 +24,34 @@ const JourneyTracker = () => {
   const [elapsed, setElapsed] = useState("");
   const trackInterval = useRef<ReturnType<typeof setInterval> | null>(null);
   const elapsedInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  const trackingStarted = useRef(false);
 
-  // Check for active journey on mount
-  useEffect(() => {
-    if (!user) return;
-    const fetchActive = async () => {
+  // Fetch active journey with React Query caching
+  const { data: journeyData } = useQuery({
+    queryKey: ["active-journey", user?.id],
+    queryFn: async () => {
       const { data } = (await supabase
         .from("journeys" as any)
         .select("id, share_token, destination_name, started_at")
-        .eq("user_id", user.id)
+        .eq("user_id", user!.id)
         .eq("is_active", true)
         .order("started_at", { ascending: false })
         .limit(1)
         .maybeSingle()) as any;
-      if (data) {
-        setJourney(data);
-        startTracking(data.id);
-      }
-    };
-    fetchActive();
+      return data ?? null;
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  useEffect(() => {
+    if (journeyData && !trackingStarted.current) {
+      setJourney(journeyData);
+      startTracking(journeyData.id);
+      trackingStarted.current = true;
+    }
     return () => stopIntervals();
-  }, [user]);
+  }, [journeyData]);
 
   // Elapsed time display
   useEffect(() => {

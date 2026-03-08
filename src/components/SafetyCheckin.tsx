@@ -18,6 +18,7 @@ const SafetyCheckin = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { location, getLocation } = useGeolocation();
+  const queryClient = useQueryClient();
   const [activeCheckin, setActiveCheckin] = useState<{
     id: string;
     expires_at: string;
@@ -27,22 +28,27 @@ const SafetyCheckin = () => {
   const [loading, setLoading] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Fetch active check-in on mount
-  useEffect(() => {
-    if (!user) return;
-    const fetchActive = async () => {
+  // Fetch active check-in with React Query caching
+  const { data: checkinData } = useQuery({
+    queryKey: ["active-checkin", user?.id],
+    queryFn: async () => {
       const { data } = (await supabase
         .from("safety_checkins" as any)
         .select("id, expires_at")
-        .eq("user_id", user.id)
+        .eq("user_id", user!.id)
         .eq("is_active", true)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle()) as any;
-      if (data) setActiveCheckin(data);
-    };
-    fetchActive();
-  }, [user]);
+      return data ?? null;
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  useEffect(() => {
+    if (checkinData) setActiveCheckin(checkinData);
+  }, [checkinData]);
 
   // Countdown timer
   useEffect(() => {

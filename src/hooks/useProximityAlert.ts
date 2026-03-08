@@ -124,21 +124,12 @@ const useProximityAlert = () => {
   useEffect(() => {
     const enabled = user && settings.proximity_alert && navigator.geolocation;
     if (!enabled) {
-      // Clean up
       if (watchIdRef.current !== null) {
         navigator.geolocation.clearWatch(watchIdRef.current);
         watchIdRef.current = null;
       }
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
       return;
     }
-
-    // Fetch reports now and periodically
-    fetchReports();
-    intervalRef.current = setInterval(fetchReports, 60_000);
 
     // Watch position
     watchIdRef.current = navigator.geolocation.watchPosition(checkProximity, undefined, {
@@ -151,12 +142,8 @@ const useProximityAlert = () => {
         navigator.geolocation.clearWatch(watchIdRef.current);
         watchIdRef.current = null;
       }
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
     };
-  }, [user, settings.proximity_alert, fetchReports, checkProximity]);
+  }, [user, settings.proximity_alert, checkProximity]);
 };
 
 export default useProximityAlert;
