@@ -64,7 +64,7 @@ const Index = () => {
   useShakeDetection({
     threshold: 25,
     debounceMs: 5000,
-    onShake: handleSOSTrigger,
+    onShake: () => handleSOSTrigger("shake"),
   });
 
   // Voice detection
