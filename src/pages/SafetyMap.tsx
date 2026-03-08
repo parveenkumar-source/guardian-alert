@@ -12,6 +12,7 @@ import { MapPin, AlertTriangle, Plus, X, Shield, Eye, Flame, Moon, Car, Users, T
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
+import { useReverseGeocode } from "@/hooks/useReverseGeocode";
 
 interface SafetyReport {
   id: string;
