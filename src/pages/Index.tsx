@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import useAutoRecording from "@/hooks/useAutoRecording";
-import { Shield, MapPin, Users, Bell, Phone, Mic, MicOff, EyeOff, PhoneIncoming, KeyRound } from "lucide-react";
+import { Shield, MapPin, Users, Bell, Phone, Mic, MicOff, EyeOff, PhoneIncoming, KeyRound, Calculator } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { generateSOSMessage } from "@/lib/contacts";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,8 +11,12 @@ import PanicMode from "@/components/PanicMode";
 import SafetyCheckin from "@/components/SafetyCheckin";
 import JourneyTracker from "@/components/JourneyTracker";
 import FakeCall from "@/components/FakeCall";
+import EmergencyInfoCard from "@/components/EmergencyInfoCard";
+import SafeZones from "@/components/SafeZones";
+import DisguiseMode from "@/components/DisguiseMode";
 import useTripleTap from "@/hooks/useTripleTap";
 import useProximityAlert from "@/hooks/useProximityAlert";
+import useBatteryAlert from "@/hooks/useBatteryAlert";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -27,11 +31,13 @@ const Index = () => {
   const { t } = useLanguage();
   const [sosState, setSosState] = useState<"idle" | "activating" | "confirmed" | "panic">("idle");
   const [fakeCallActive, setFakeCallActive] = useState(false);
+  const [disguiseActive, setDisguiseActive] = useState(false);
   const { location, getLocation } = useGeolocation();
   const { toast } = useToast();
   const { user } = useAuth();
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoRecording = useAutoRecording();
+  useBatteryAlert();
 
   const canTrigger = useCallback(async () => {
     if (sosState !== "idle") return false;
@@ -147,6 +153,14 @@ const Index = () => {
       pulse: false,
       disabled: fakeCallActive,
     },
+    {
+      icon: Calculator,
+      label: "Disguise",
+      onClick: () => setDisguiseActive(true),
+      active: false,
+      activeClass: "",
+      pulse: false,
+    },
     ...(settings.safe_word
       ? [{
           icon: KeyRound,
@@ -184,6 +198,7 @@ const Index = () => {
       {fakeCallActive && (
         <FakeCall callerName={settings.fake_call_name || "Mom"} delay={settings.fake_call_delay || 5} onEnd={() => setFakeCallActive(false)} key="fake-call" />
       )}
+      {disguiseActive && <DisguiseMode onExit={() => setDisguiseActive(false)} />}
 
       {/* Hero SOS Section */}
       <section className="relative min-h-[calc(100vh-8rem)] flex flex-col items-center justify-center px-4 overflow-hidden">
@@ -260,6 +275,8 @@ const Index = () => {
           <div className="w-full max-w-xs space-y-3">
             <SafetyCheckin />
             <JourneyTracker />
+            <EmergencyInfoCard />
+            <SafeZones />
           </div>
         </div>
       </section>
