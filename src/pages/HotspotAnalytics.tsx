@@ -132,14 +132,17 @@ const HotspotAnalytics = () => {
       doc.setTextColor(40);
       doc.text("Top Sensitive Areas (Sabse Khatarnak Ilake)", 14, 52);
 
-      const tableData = topHotspots.map((h, i) => [
-        `#${i + 1}`,
-        `${h.lat.toFixed(4)}, ${h.lng.toFixed(4)}`,
-        `https://maps.google.com/?q=${h.lat},${h.lng}`,
-        h.count.toString(),
-        Object.entries(h.categories).sort((a, b) => b[1] - a[1]).map(([c, n]) => `${c}(${n})`).join(", "),
-        Object.entries(h.severities).sort((a, b) => b[1] - a[1]).map(([s, n]) => `${s}(${n})`).join(", "),
-      ]);
+      const tableData = topHotspots.map((h, i) => {
+        const areaName = getName(h.lat, h.lng) || `${h.lat.toFixed(4)}, ${h.lng.toFixed(4)}`;
+        return [
+          `#${i + 1}`,
+          areaName,
+          `https://maps.google.com/?q=${h.lat},${h.lng}`,
+          h.count.toString(),
+          Object.entries(h.categories).sort((a, b) => b[1] - a[1]).map(([c, n]) => `${c}(${n})`).join(", "),
+          Object.entries(h.severities).sort((a, b) => b[1] - a[1]).map(([s, n]) => `${s}(${n})`).join(", "),
+        ];
+      });
 
       autoTable(doc, {
         startY: 56,
