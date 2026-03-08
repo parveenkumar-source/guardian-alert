@@ -5,6 +5,7 @@ import { generateSOSMessage } from "@/lib/contacts";
 import { supabase } from "@/integrations/supabase/client";
 import SOSActivation from "@/components/SOSActivation";
 import SOSConfirmed from "@/components/SOSConfirmed";
+import SafetyTips from "@/components/SafetyTips";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -89,6 +90,12 @@ const Index = () => {
               <span className="text-xs font-medium text-foreground">Helplines</span>
             </Link>
           </div>
+        </div>
+      </section>
+
+      <section className="py-12 px-4">
+        <div className="container mx-auto max-w-lg">
+          <SafetyTips location={location} />
         </div>
       </section>
 
