@@ -89,6 +89,42 @@ export type Database = {
         }
         Relationships: []
       }
+      evidence_recordings: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          file_path: string
+          file_type: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          sos_trigger_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          file_path: string
+          file_type?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          sos_trigger_type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          file_path?: string
+          file_type?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          sos_trigger_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       journey_points: {
         Row: {
           id: string

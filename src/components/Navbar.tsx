@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Shield, Users, Home, Phone, LogIn, LogOut, Navigation, FileText, Settings, MapPin } from "lucide-react";
+import { Shield, Users, Home, Phone, LogIn, LogOut, Navigation, FileText, Settings, MapPin, Camera } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
@@ -14,6 +14,7 @@ const Navbar = () => {
     { to: "/contacts", label: "Contacts", icon: Users },
     { to: "/helplines", label: "Helplines", icon: Phone },
     { to: "/activity", label: "Log", icon: FileText },
+    { to: "/evidence", label: "Evidence", icon: Camera },
     { to: "/settings", label: "Settings", icon: Settings },
   ];
 

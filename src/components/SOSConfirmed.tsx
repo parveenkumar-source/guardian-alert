@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/hooks/useSettings";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import EvidenceRecorder from "@/components/EvidenceRecorder";
 
 interface Contact {
   name: string;
@@ -181,6 +182,9 @@ const SOSConfirmed = ({ location, onDismiss }: SOSConfirmedProps) => {
             </div>
           </div>
         )}
+
+        {/* Evidence Recording */}
+        <EvidenceRecorder location={location} triggerType="manual" />
 
         <div className="flex gap-3 w-full">
           <button
