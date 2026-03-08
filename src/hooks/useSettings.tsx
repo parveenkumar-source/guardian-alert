@@ -12,6 +12,7 @@ export interface UserSettings {
   fake_call_name: string;
   fake_call_delay: number;
   triple_tap_sos: boolean;
+  proximity_alert: boolean;
 }
 
 const defaults: UserSettings = {
@@ -24,6 +25,7 @@ const defaults: UserSettings = {
   fake_call_name: "Mom",
   fake_call_delay: 5,
   triple_tap_sos: true,
+  proximity_alert: false,
 };
 
 interface SettingsContextType {
