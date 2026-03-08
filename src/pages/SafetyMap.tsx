@@ -262,6 +262,10 @@ const SafetyMap = () => {
       .slice(0, 5);
   }, [reports]);
 
+  // Reverse geocode danger zone coordinates
+  const dangerZoneCoords = useMemo(() => dangerZones.map(z => ({ lat: z.lat, lng: z.lng })), [dangerZones]);
+  const { getName } = useReverseGeocode(dangerZoneCoords);
+
   return (
     <div className="min-h-screen bg-background pt-16 pb-24 md:pb-8 px-4 page-transition">
       <div className="container mx-auto max-w-4xl space-y-6">
