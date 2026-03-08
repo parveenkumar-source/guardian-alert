@@ -41,6 +41,23 @@ const Index = () => {
     onShake: handleSOSTrigger,
   });
 
+  // Voice detection — triggers SOS on distress keywords ("help", "bachao", etc.)
+  const { listening, supported: voiceSupported } = useVoiceDetection({
+    enabled: voiceEnabled,
+    onDistressDetected: handleSOSTrigger,
+    debounceMs: 5000,
+  });
+
+  const toggleVoice = () => {
+    if (!voiceEnabled) {
+      toast({
+        title: "Voice Detection Enabled",
+        description: 'Say "Help", "Bachao", or "SOS" to trigger an alert.',
+      });
+    }
+    setVoiceEnabled(!voiceEnabled);
+  };
+
   const handleSOSConfirm = () => setSosState("confirmed");
   const handleSOSCancel = () => setSosState("idle");
   const handleSOSDismiss = () => setSosState("idle");
@@ -90,6 +107,30 @@ const Index = () => {
           </div>
 
           <p className="text-muted-foreground text-xs">Press and hold or tap to activate emergency alert</p>
+
+          {/* Voice Detection Toggle */}
+          {voiceSupported !== false && (
+            <button
+              onClick={toggleVoice}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all ${
+                voiceEnabled
+                  ? "bg-safe/15 text-safe border border-safe/30"
+                  : "bg-secondary text-muted-foreground border border-border hover:text-foreground"
+              }`}
+            >
+              {voiceEnabled ? (
+                <>
+                  <Mic className={`w-3.5 h-3.5 ${listening ? "animate-pulse" : ""}`} />
+                  Voice Detection On {listening && "· Listening..."}
+                </>
+              ) : (
+                <>
+                  <MicOff className="w-3.5 h-3.5" />
+                  Enable Voice SOS
+                </>
+              )}
+            </button>
+          )}
 
           <div className="flex gap-3 w-full max-w-xs">
             <Link to="/contacts" className="flex-1 glass-card-hover p-3 flex flex-col items-center gap-1.5 text-center">
