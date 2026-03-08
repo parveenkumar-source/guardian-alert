@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Camera, Mic, Trash2, Download, Loader2, FileAudio, Image as ImageIcon } from "lucide-react";
+import { Camera, Mic, Trash2, Download, Loader2, FileAudio, Image as ImageIcon, Archive } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import JSZip from "jszip";
 
 interface EvidenceRecord {
   id: string;
