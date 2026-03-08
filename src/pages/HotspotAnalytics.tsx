@@ -119,7 +119,7 @@ const HotspotAnalytics = () => {
       // Title
       doc.setFontSize(20);
       doc.setTextColor(200, 40, 60);
-      doc.text("RAKSHA - Mahila Suraksha Hotspot Report", 14, 20);
+      doc.text("RAKSHA - Women Safety Hotspot Report", 14, 20);
 
       doc.setFontSize(10);
       doc.setTextColor(100);
