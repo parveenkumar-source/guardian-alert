@@ -173,9 +173,9 @@ const HotspotAnalytics = () => {
       doc.text("Please submit this report to your local police station for further action.", 14, doc.internal.pageSize.height - 15);
 
       doc.save(`Raksha_Hotspot_Report_${new Date().toISOString().split("T")[0]}.pdf`);
-      toast({ title: "PDF Download Ho Gaya!", description: "Is report ko police station mein submit karein." });
+      toast({ title: "PDF Downloaded!", description: "Submit this report to your local police station." });
     } catch (e) {
-      toast({ title: "Error", description: "PDF generate nahi ho paya", variant: "destructive" });
+      toast({ title: "Error", description: "Failed to generate PDF", variant: "destructive" });
     } finally {
       setGeneratingPdf(false);
     }
