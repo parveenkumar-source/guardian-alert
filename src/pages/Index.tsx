@@ -31,6 +31,7 @@ const Index = () => {
   const { t } = useLanguage();
   const [sosState, setSosState] = useState<"idle" | "activating" | "confirmed" | "panic">("idle");
   const [fakeCallActive, setFakeCallActive] = useState(false);
+  const [disguiseActive, setDisguiseActive] = useState(false);
   const { location, getLocation } = useGeolocation();
   const { toast } = useToast();
   const { user } = useAuth();
