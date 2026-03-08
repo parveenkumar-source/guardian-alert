@@ -21,6 +21,9 @@ import SettingsPage from "./pages/Settings";
 import Evidence from "./pages/Evidence";
 import CommunityFeed from "./pages/CommunityFeed";
 import HotspotAnalytics from "./pages/HotspotAnalytics";
+import AIChatbot from "./pages/AIChatbot";
+import IncidentReport from "./pages/IncidentReport";
+import ThreatAssessment from "./pages/ThreatAssessment";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
