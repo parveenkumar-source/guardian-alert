@@ -1,5 +1,7 @@
-import { ChevronDown, ChevronUp, type LucideIcon } from "lucide-react";
+import { useState } from "react";
+import { ChevronDown, Image, Play, type LucideIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import AnimatedDemo from "./AnimatedDemo";
 
 interface Technique {
   title: string;
