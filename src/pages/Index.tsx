@@ -87,6 +87,9 @@ const Index = () => {
     enabled: sosState === "idle" && settings.triple_tap_sos,
   });
 
+  // Proximity-based auto-alert for unsafe areas
+  useProximityAlert();
+
   const toggleVoice = async () => {
     const newVal = !settings.voice_detection;
     if (newVal) {
