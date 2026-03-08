@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, AlertTriangle, Plus, X, Shield, Eye, Flame, Moon, Car, Users, ThumbsUp, ThumbsDown } from "lucide-react";
+import { MapPin, AlertTriangle, Plus, X, Shield, Eye, Flame, Moon, Car, Users, ThumbsUp, ThumbsDown, TriangleAlert } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Link } from "react-router-dom";
 
 interface SafetyReport {
   id: string;
@@ -233,6 +236,31 @@ const SafetyMap = () => {
     return counts.up - counts.down;
   };
 
+  // Compute hotspot danger zones from reports
+  const dangerZones = useMemo(() => {
+    const gridSize = 200; // ~0.5km grid
+    const map = new Map<string, { lat: number; lng: number; count: number; categories: Set<string>; maxSeverity: string }>();
+    const sevOrder: Record<string, number> = { low: 0, medium: 1, high: 2, critical: 3 };
+
+    for (const r of reports) {
+      const key = `${(Math.round(r.latitude * gridSize) / gridSize).toFixed(3)},${(Math.round(r.longitude * gridSize) / gridSize).toFixed(3)}`;
+      if (!map.has(key)) {
+        map.set(key, { lat: r.latitude, lng: r.longitude, count: 0, categories: new Set(), maxSeverity: "low" });
+      }
+      const z = map.get(key)!;
+      z.count++;
+      z.categories.add(r.category);
+      if ((sevOrder[r.severity] || 0) > (sevOrder[z.maxSeverity] || 0)) {
+        z.maxSeverity = r.severity;
+      }
+    }
+
+    return Array.from(map.values())
+      .filter(z => z.count >= 2 || z.maxSeverity === "high")
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  }, [reports]);
+
   return (
     <div className="min-h-screen bg-background pt-16 pb-24 md:pb-8 px-4 page-transition">
       <div className="container mx-auto max-w-4xl space-y-6">
@@ -337,6 +365,59 @@ const SafetyMap = () => {
           </div>
         </Card>
 
+        {/* Danger Zones */}
+        {dangerZones.length > 0 && (
+          <Card className="border-destructive/40 bg-destructive/5">
+            <CardHeader className="p-3 pb-1">
+              <CardTitle className="text-sm flex items-center gap-2 text-destructive">
+                <TriangleAlert className="w-4 h-4" />
+                Danger Zones — Khatarnak Ilake
+                <Link to="/hotspots" className="ml-auto text-[10px] font-normal text-primary hover:underline">
+                  View Full Report →
+                </Link>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-3 pt-1 space-y-2">
+              {dangerZones.map((zone, i) => {
+                const maxCount = dangerZones[0]?.count || 1;
+                return (
+                  <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-background/60 border border-destructive/20">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                      zone.maxSeverity === "high" ? "bg-destructive/30 text-destructive" : "bg-orange-500/30 text-orange-400"
+                    }`}>
+                      <TriangleAlert className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <a
+                          href={`https://maps.google.com/?q=${zone.lat},${zone.lng}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-medium text-primary hover:underline truncate"
+                        >
+                          📍 {zone.lat.toFixed(4)}, {zone.lng.toFixed(4)}
+                        </a>
+                        <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${
+                          zone.maxSeverity === "high" ? "bg-destructive/20 text-destructive" : "bg-orange-500/20 text-orange-400"
+                        }`}>
+                          {zone.count} reports
+                        </span>
+                      </div>
+                      <Progress value={(zone.count / maxCount) * 100} className="h-1 mt-1" />
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {Array.from(zone.categories).slice(0, 3).map(cat => (
+                          <span key={cat} className="text-[9px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">
+                            {getCategoryInfo(cat).label}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+        )}
         {/* Reports list */}
         <div className="space-y-3">
           <h2 className="text-lg font-semibold text-foreground">
