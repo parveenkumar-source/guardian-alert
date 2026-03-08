@@ -69,6 +69,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
           voice_detection: data.voice_detection ?? false,
           fake_call_name: data.fake_call_name ?? "Mom",
           fake_call_delay: data.fake_call_delay ?? 5,
+          triple_tap_sos: data.triple_tap_sos ?? true,
         });
       }
       setLoading(false);
