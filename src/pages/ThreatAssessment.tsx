@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShieldAlert, Loader2, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
+import { ShieldAlert, Loader2, AlertTriangle, CheckCircle, XCircle, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -14,18 +14,11 @@ interface Assessment {
   summary: string;
 }
 
-const riskColors: Record<string, string> = {
-  LOW: "text-green-500 bg-green-500/10 border-green-500/30",
-  MODERATE: "text-yellow-500 bg-yellow-500/10 border-yellow-500/30",
-  HIGH: "text-orange-500 bg-orange-500/10 border-orange-500/30",
-  CRITICAL: "text-red-500 bg-red-500/10 border-red-500/30",
-};
-
-const riskIcons: Record<string, typeof CheckCircle> = {
-  LOW: CheckCircle,
-  MODERATE: AlertTriangle,
-  HIGH: AlertTriangle,
-  CRITICAL: XCircle,
+const riskConfig: Record<string, { color: string; bg: string; icon: typeof CheckCircle }> = {
+  LOW: { color: "text-green-500", bg: "bg-green-500/10 border-green-500/30", icon: CheckCircle },
+  MODERATE: { color: "text-yellow-500", bg: "bg-yellow-500/10 border-yellow-500/30", icon: AlertTriangle },
+  HIGH: { color: "text-orange-500", bg: "bg-orange-500/10 border-orange-500/30", icon: AlertTriangle },
+  CRITICAL: { color: "text-red-500", bg: "bg-red-500/10 border-red-500/30", icon: XCircle },
 };
 
 const ThreatAssessment = () => {
@@ -58,48 +51,51 @@ const ThreatAssessment = () => {
     }
   };
 
-  const RiskIcon = assessment ? (riskIcons[assessment.riskLevel] || AlertTriangle) : AlertTriangle;
+  const config = assessment ? (riskConfig[assessment.riskLevel] || riskConfig.MODERATE) : riskConfig.MODERATE;
+  const RiskIcon = config.icon;
 
   return (
     <div className="min-h-screen pt-14 pb-20 md:pb-0">
-      <div className="container mx-auto max-w-2xl px-4 py-6">
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium mb-3">
-            <ShieldAlert className="w-3.5 h-3.5" />
-            AI
+      <div className="container mx-auto max-w-2xl px-3 sm:px-4 py-5 sm:py-6">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-warning/20 to-warning/5 flex items-center justify-center">
+            <ShieldAlert className="w-5 h-5 text-warning" />
           </div>
-          <h1 className="font-display text-2xl font-bold text-foreground">{t("threat_title")}</h1>
-          <p className="text-muted-foreground text-sm mt-1">{t("threat_subtitle")}</p>
+          <div>
+            <h1 className="font-display text-xl sm:text-2xl font-bold text-foreground">{t("threat_title")}</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">{t("threat_subtitle")}</p>
+          </div>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">{t("threat_describe")}</label>
+            <label className="text-xs sm:text-sm font-medium text-foreground mb-1.5 block">{t("threat_describe")}</label>
             <textarea
               value={situation}
               onChange={(e) => setSituation(e.target.value)}
               placeholder={t("threat_describe_placeholder")}
               rows={4}
-              className="w-full glass-card px-4 py-3 text-sm rounded-xl bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+              className="w-full glass-card px-3.5 sm:px-4 py-3 text-sm rounded-xl bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">{t("threat_location")}</label>
+              <label className="text-xs sm:text-sm font-medium text-foreground mb-1.5 block">{t("threat_location")}</label>
               <input
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder={t("threat_location_placeholder")}
-                className="w-full glass-card px-4 py-3 text-sm rounded-xl bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full glass-card px-3.5 sm:px-4 py-3 text-sm rounded-xl bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">{t("threat_time")}</label>
+              <label className="text-xs sm:text-sm font-medium text-foreground mb-1.5 block">{t("threat_time")}</label>
               <select
                 value={timeOfDay}
                 onChange={(e) => setTimeOfDay(e.target.value)}
-                className="w-full glass-card px-4 py-3 text-sm rounded-xl bg-transparent text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full glass-card px-3.5 sm:px-4 py-3 text-sm rounded-xl bg-transparent text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
               >
                 <option value="">{t("threat_select_time")}</option>
                 <option value="morning">{t("threat_morning")}</option>
@@ -111,12 +107,12 @@ const ThreatAssessment = () => {
             </div>
           </div>
 
-          <label className="flex items-center gap-3 glass-card px-4 py-3 rounded-xl cursor-pointer">
+          <label className="flex items-center gap-3 glass-card px-3.5 sm:px-4 py-3.5 rounded-xl cursor-pointer active:scale-[0.99] transition-transform">
             <input
               type="checkbox"
               checked={alone}
               onChange={(e) => setAlone(e.target.checked)}
-              className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+              className="w-4.5 h-4.5 rounded border-border text-primary focus:ring-primary accent-primary"
             />
             <span className="text-sm text-foreground">{t("threat_alone")}</span>
           </label>
@@ -124,68 +120,69 @@ const ThreatAssessment = () => {
           <button
             onClick={assessThreat}
             disabled={loading || !situation.trim()}
-            className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+            className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 disabled:opacity-50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
           >
             {loading ? <><Loader2 className="w-4 h-4 animate-spin" />{t("threat_analyzing")}</> : <><ShieldAlert className="w-4 h-4" />{t("threat_assess")}</>}
           </button>
 
           {/* Assessment Result */}
           {assessment && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+            <div className="space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
               {/* Risk Level Badge */}
-              <div className={`flex items-center justify-between p-4 rounded-xl border ${riskColors[assessment.riskLevel] || riskColors.MODERATE}`}>
+              <div className={`flex items-center justify-between p-4 rounded-xl border ${config.bg}`}>
                 <div className="flex items-center gap-3">
-                  <RiskIcon className="w-6 h-6" />
+                  <RiskIcon className={`w-6 h-6 sm:w-7 sm:h-7 ${config.color}`} />
                   <div>
-                    <p className="font-bold text-lg">{assessment.riskLevel}</p>
-                    <p className="text-xs opacity-80">{t("threat_risk_score")}: {assessment.riskScore}/10</p>
+                    <p className={`font-bold text-base sm:text-lg ${config.color}`}>{assessment.riskLevel}</p>
+                    <p className="text-xs opacity-80 text-muted-foreground">{t("threat_risk_score")}: {assessment.riskScore}/10</p>
                   </div>
                 </div>
-                <div className="w-14 h-14 rounded-full border-4 border-current flex items-center justify-center">
-                  <span className="text-xl font-bold">{assessment.riskScore}</span>
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full border-[3px] ${config.color} border-current flex items-center justify-center`}>
+                  <span className={`text-lg sm:text-xl font-bold ${config.color}`}>{assessment.riskScore}</span>
                 </div>
               </div>
 
               {/* Summary */}
-              <div className="glass-card p-4 rounded-xl">
-                <p className="text-sm text-foreground">{assessment.summary}</p>
+              <div className="glass-card p-3.5 sm:p-4 rounded-xl">
+                <p className="text-sm text-foreground leading-relaxed">{assessment.summary}</p>
               </div>
 
               {/* Threat Analysis */}
-              <div className="glass-card p-4 rounded-xl">
-                <h3 className="text-sm font-semibold text-foreground mb-2">{t("threat_analysis")}</h3>
-                <p className="text-sm text-muted-foreground">{assessment.threatAnalysis}</p>
+              <div className="glass-card p-3.5 sm:p-4 rounded-xl">
+                <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-2">{t("threat_analysis")}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{assessment.threatAnalysis}</p>
               </div>
 
               {/* Immediate Actions */}
-              <div className="glass-card p-4 rounded-xl">
-                <h3 className="text-sm font-semibold text-foreground mb-2">🚨 {t("threat_immediate_actions")}</h3>
+              <div className="glass-card p-3.5 sm:p-4 rounded-xl">
+                <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-2.5">🚨 {t("threat_immediate_actions")}</h3>
                 <ul className="space-y-2">
                   {assessment.immediateActions?.map((action, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">{i + 1}</span>
-                      {action}
+                    <li key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-muted-foreground">
+                      <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] sm:text-xs font-bold shrink-0 mt-0.5">{i + 1}</span>
+                      <span className="leading-relaxed">{action}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
               {/* Precautions */}
-              <div className="glass-card p-4 rounded-xl">
-                <h3 className="text-sm font-semibold text-foreground mb-2">🛡️ {t("threat_precautions")}</h3>
+              <div className="glass-card p-3.5 sm:p-4 rounded-xl">
+                <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-2">🛡️ {t("threat_precautions")}</h3>
                 <ul className="space-y-1.5">
                   {assessment.precautions?.map((p, i) => (
-                    <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
-                      <span className="text-primary">•</span> {p}
+                    <li key={i} className="text-xs sm:text-sm text-muted-foreground flex items-start gap-2">
+                      <span className="text-primary mt-1">•</span>
+                      <span className="leading-relaxed">{p}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
               {/* Emergency Protocol */}
-              <div className="glass-card p-4 rounded-xl border border-destructive/30 bg-destructive/5">
-                <h3 className="text-sm font-semibold text-foreground mb-2">📞 {t("threat_emergency")}</h3>
-                <p className="text-sm text-muted-foreground">{assessment.emergencyProtocol}</p>
+              <div className="glass-card p-3.5 sm:p-4 rounded-xl border border-destructive/20 bg-destructive/5">
+                <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-2">📞 {t("threat_emergency")}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{assessment.emergencyProtocol}</p>
               </div>
             </div>
           )}
