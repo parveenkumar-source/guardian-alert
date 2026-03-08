@@ -104,10 +104,22 @@ const Index = () => {
     await updateSettings({ voice_detection: newVal });
   };
 
-  const handleSOSConfirm = () => setSosState("confirmed");
-  const handleSOSCancel = () => setSosState("idle");
-  const handleSOSDismiss = () => setSosState("idle");
-  const handlePanicExit = () => setSosState("idle");
+  const handleSOSConfirm = () => {
+    autoRecording.stop();
+    setSosState("confirmed");
+  };
+  const handleSOSCancel = () => {
+    autoRecording.clear();
+    setSosState("idle");
+  };
+  const handleSOSDismiss = () => {
+    autoRecording.clear();
+    setSosState("idle");
+  };
+  const handlePanicExit = () => {
+    autoRecording.clear();
+    setSosState("idle");
+  };
 
   const features = [
     { icon: MapPin, title: "Live GPS Tracking", description: "Real-time location sharing with emergency contacts" },
