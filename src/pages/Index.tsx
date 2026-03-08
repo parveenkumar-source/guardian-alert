@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import { Shield, MapPin, Users, Bell, ChevronRight, Phone, Mic, MicOff, EyeOff, PhoneIncoming } from "lucide-react";
+import { Shield, MapPin, Users, Bell, ChevronRight, Phone, Mic, MicOff, EyeOff, PhoneIncoming, KeyRound } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { generateSOSMessage } from "@/lib/contacts";
 import { supabase } from "@/integrations/supabase/client";
