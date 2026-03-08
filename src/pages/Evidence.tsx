@@ -22,6 +22,7 @@ const Evidence = () => {
   const [records, setRecords] = useState<EvidenceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     if (!user) return;
