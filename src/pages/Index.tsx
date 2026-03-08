@@ -17,7 +17,8 @@ const Index = () => {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  const handleSOSTrigger = async () => {
+  const handleSOSTrigger = useCallback(async () => {
+    if (sosState !== "idle") return;
     if (!user) {
       toast({ title: "Please sign in first", description: "You need to be logged in to use SOS.", variant: "destructive" });
       return;
@@ -29,7 +30,14 @@ const Index = () => {
     }
     getLocation();
     setSosState("activating");
-  };
+  }, [sosState, user, toast, getLocation]);
+
+  // Shake detection — triggers SOS when phone is shaken vigorously
+  useShakeDetection({
+    threshold: 25,
+    debounceMs: 5000,
+    onShake: handleSOSTrigger,
+  });
 
   const handleSOSConfirm = () => setSosState("confirmed");
   const handleSOSCancel = () => setSosState("idle");
