@@ -157,7 +157,7 @@ const Navbar = () => {
         <div className="fixed inset-0 z-40 md:hidden" onClick={() => setMobileMenuOpen(false)}>
           <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />
           <div
-            className="absolute bottom-16 left-3 right-3 glass-card p-3 space-y-1 animate-in slide-in-from-bottom-4 fade-in duration-200"
+            className="absolute bottom-16 left-3 right-3 max-h-[70vh] overflow-y-auto glass-card p-3 space-y-1 animate-in slide-in-from-bottom-4 fade-in duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {[...mainLinks.slice(1), ...secondaryLinks].map(({ to, label, icon: Icon }) => (
