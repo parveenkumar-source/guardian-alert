@@ -117,16 +117,16 @@ const Navbar = () => {
 
       {/* Mobile bottom navigation */}
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
-        <div className="glass-card border-t border-border/50 rounded-none px-2 pb-[env(safe-area-inset-bottom)]">
-          <div className="flex items-center justify-around h-14">
+        <div className="bg-card/80 backdrop-blur-xl border-t border-border/50 px-1 pb-[env(safe-area-inset-bottom)]">
+          <div className="flex items-center justify-around h-16">
             {bottomNavLinks.map((item) => {
               if (item.isMore) {
                 return (
                   <button
                     key="more"
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    className={`flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-lg transition-all ${
-                      mobileMenuOpen ? "text-primary" : "text-muted-foreground"
+                    className={`flex flex-col items-center justify-center gap-1 w-14 py-1.5 rounded-2xl transition-all ${
+                      mobileMenuOpen ? "text-primary bg-primary/10" : "text-muted-foreground"
                     }`}
                   >
                     {mobileMenuOpen ? <X className="w-5 h-5" /> : <item.icon className="w-5 h-5" />}
@@ -137,14 +137,13 @@ const Navbar = () => {
               return (
                 <Link key={item.to} to={item.to}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-lg transition-all ${
+                  className={`relative flex flex-col items-center justify-center gap-1 w-14 py-1.5 rounded-2xl transition-all ${
                     isActive(item.to)
-                      ? "text-primary"
+                      ? "text-primary bg-primary/10"
                       : "text-muted-foreground active:text-foreground"
                   }`}>
                   <item.icon className={`w-5 h-5 ${isActive(item.to) ? "drop-shadow-[0_0_6px_hsl(var(--primary)/0.5)]" : ""}`} />
                   <span className="text-[10px] font-medium">{item.label}</span>
-                  {isActive(item.to) && <div className="absolute -bottom-0.5 w-5 h-0.5 rounded-full bg-primary" />}
                 </Link>
               );
             })}
@@ -155,23 +154,30 @@ const Navbar = () => {
       {/* Mobile "More" drawer */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-40 md:hidden" onClick={() => setMobileMenuOpen(false)}>
-          <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
           <div
-            className="absolute bottom-16 left-3 right-3 max-h-[70vh] overflow-y-auto glass-card p-3 space-y-1 animate-in slide-in-from-bottom-4 fade-in duration-200"
+            className="absolute bottom-[4.5rem] left-3 right-3 max-h-[65vh] overflow-y-auto glass-card p-2 space-y-0.5 animate-in slide-in-from-bottom-4 fade-in duration-200 rounded-2xl"
             onClick={(e) => e.stopPropagation()}
           >
+            <div className="px-3 py-2">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Navigation</p>
+            </div>
             {[...mainLinks.slice(1), ...secondaryLinks].map(({ to, label, icon: Icon }) => (
               <Link
                 key={to}
                 to={to}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   isActive(to)
                     ? "bg-primary/15 text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/80"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/80 active:bg-secondary"
                 }`}
               >
-                <Icon className="w-4.5 h-4.5" />
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                  isActive(to) ? "bg-primary/15" : "bg-secondary/80"
+                }`}>
+                  <Icon className="w-4 h-4" />
+                </div>
                 {label}
               </Link>
             ))}
