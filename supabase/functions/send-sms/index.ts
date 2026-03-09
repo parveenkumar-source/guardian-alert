@@ -69,10 +69,10 @@ Deno.serve(async (req) => {
       })
     );
 
-    const summary = results.map((r, i) => ({
-      contact: contacts[i].name,
-      ...(r.status === "fulfilled" ? r.value : { success: false, error: r.reason?.message }),
-    }));
+    const summary = results.map((r, i) => {
+      const base = r.status === "fulfilled" ? r.value : { success: false, error: r.reason?.message };
+      return { ...base, contact: contacts[i].name };
+    });
 
     return new Response(JSON.stringify({ success: true, results: summary }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
