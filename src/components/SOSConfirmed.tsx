@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { CheckCircle, MapPin, Share2, MessageCircle, Send, Mic } from "lucide-react";
+import { CheckCircle, MapPin, Share2, MessageCircle, Send, Mic, Phone } from "lucide-react";
 import { generateSOSMessage } from "@/lib/contacts";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/hooks/useSettings";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useAuth } from "@/hooks/useAuth";
+import { sendEmergencyAlert, sendViaNativeSMS, sendAllWhatsApp } from "@/lib/alertSender";
 import EvidenceRecorder from "@/components/EvidenceRecorder";
 
 interface Contact {
@@ -26,8 +27,8 @@ interface SOSConfirmedProps {
 
 const SOSConfirmed = ({ location, onDismiss, autoRecording }: SOSConfirmedProps) => {
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const [smsSent, setSmsSent] = useState(false);
-  const [smsSending, setSmsSending] = useState(false);
+  const [alertStatus, setAlertStatus] = useState<"sending" | "sent" | "fallback" | "failed">("sending");
+  const [alertMethod, setAlertMethod] = useState<string>("");
   const [whatsappSentTo, setWhatsappSentTo] = useState<Set<string>>(new Set());
   const [autoRecordingSaved, setAutoRecordingSaved] = useState(false);
   const { toast } = useToast();
@@ -78,34 +79,33 @@ const SOSConfirmed = ({ location, onDismiss, autoRecording }: SOSConfirmedProps)
       });
   }, []);
 
-  // Auto-send SMS on mount (if enabled)
+  // Auto-send alerts on mount
   useEffect(() => {
-    if (!settings.notify_sms) return;
-    const sendSMS = async () => {
-      setSmsSending(true);
-      try {
-        const { data, error } = await supabase.functions.invoke("send-sms", {
-          body: { message },
-        });
-        if (error) throw error;
-        setSmsSent(true);
-        const successCount = data?.results?.filter((r: any) => r.success).length || 0;
+    if (!contacts.length || !settings.notify_sms) return;
+
+    const doAlert = async () => {
+      setAlertStatus("sending");
+      const result = await sendEmergencyAlert(contacts, message);
+      
+      if (result.method === "edge") {
+        const successCount = result.edgeResult?.results?.filter((r: any) => r.success).length || 0;
+        setAlertStatus("sent");
+        setAlertMethod("SMS");
         toast({
-          title: "SMS Alerts Sent!",
-          description: `${successCount} emergency contact${successCount !== 1 ? "s" : ""} notified via SMS.`,
+          title: "✅ SMS Alert Sent!",
+          description: `${successCount} contact${successCount !== 1 ? "s" : ""} notified.`,
         });
-      } catch (err: any) {
-        console.error("SMS send error:", err);
+      } else {
+        // Native SMS fallback was triggered
+        setAlertStatus("fallback");
+        setAlertMethod("Native SMS");
         toast({
-          title: "SMS delivery issue",
-          description: "Use WhatsApp below to alert your contacts instantly.",
-          variant: "destructive",
+          title: "📱 SMS App Opened",
+          description: "Tap Send in your SMS app to alert contacts. Also use WhatsApp below.",
         });
-      } finally {
-        setSmsSending(false);
       }
     };
-    sendSMS();
+    doAlert();
 
     // Also send push notification
     if (pushSubscribed) {
@@ -116,20 +116,23 @@ const SOSConfirmed = ({ location, onDismiss, autoRecording }: SOSConfirmedProps)
           : "Emergency alert sent to your contacts."
       );
     }
-  }, []);
+  }, [contacts.length]);
 
   const openWhatsApp = (contact: Contact) => {
-    // Strip non-digit characters except leading +
     const phone = contact.phone.replace(/[^\d]/g, "");
     const encoded = encodeURIComponent(message);
     window.open(`https://wa.me/${phone}?text=${encoded}`, "_blank");
     setWhatsappSentTo((prev) => new Set(prev).add(contact.phone));
   };
 
-  const sendAllWhatsApp = () => {
-    contacts.forEach((contact, i) => {
-      setTimeout(() => openWhatsApp(contact), i * 600);
-    });
+  const handleSendAllWhatsApp = () => {
+    sendAllWhatsApp(contacts, message);
+    contacts.forEach((c) => setWhatsappSentTo((prev) => new Set(prev).add(c.phone)));
+  };
+
+  const handleNativeSMS = () => {
+    sendViaNativeSMS(contacts, message);
+    toast({ title: "📱 SMS App Opened", description: "Tap Send to alert your contacts." });
   };
 
   const handleShare = async () => {
@@ -155,6 +158,15 @@ const SOSConfirmed = ({ location, onDismiss, autoRecording }: SOSConfirmedProps)
           <p className="text-muted-foreground text-sm">
             Emergency alerts prepared for {contacts.length} contact{contacts.length !== 1 ? "s" : ""}.
           </p>
+          {alertStatus === "sending" && (
+            <p className="text-xs text-primary animate-pulse">Sending alerts...</p>
+          )}
+          {alertStatus === "sent" && (
+            <p className="text-xs text-safe">✅ {alertMethod} delivered successfully</p>
+          )}
+          {alertStatus === "fallback" && (
+            <p className="text-xs text-amber-500">📱 SMS app opened — tap Send to deliver</p>
+          )}
         </div>
 
         {location && (
@@ -181,40 +193,50 @@ const SOSConfirmed = ({ location, onDismiss, autoRecording }: SOSConfirmedProps)
           <p className="text-xs text-foreground/80 whitespace-pre-line">{message}</p>
         </div>
 
-        {/* WhatsApp Alert Section */}
-        {contacts.length > 0 && settings.notify_whatsapp && (
-          <div className="w-full space-y-3">
+        {/* Quick Action Buttons */}
+        <div className="w-full grid grid-cols-2 gap-2">
+          <button
+            onClick={handleNativeSMS}
+            className="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-primary text-primary-foreground font-medium text-sm transition-all hover:bg-primary/90 active:scale-[0.98]"
+          >
+            <Phone className="w-4 h-4" />
+            Send via SMS
+          </button>
+          {contacts.length > 0 && settings.notify_whatsapp && (
             <button
-              onClick={sendAllWhatsApp}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-[#25D366] text-white font-medium text-sm transition-all hover:bg-[#1ebe57] active:scale-[0.98]"
+              onClick={handleSendAllWhatsApp}
+              className="flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-[#25D366] text-white font-medium text-sm transition-all hover:bg-[#1ebe57] active:scale-[0.98]"
             >
               <MessageCircle className="w-4 h-4" />
-              Alert All via WhatsApp
+              WhatsApp All
             </button>
+          )}
+        </div>
 
-            <div className="space-y-2">
-              {contacts.map((contact) => (
-                <button
-                  key={contact.phone}
-                  onClick={() => openWhatsApp(contact)}
-                  className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg bg-secondary/80 hover:bg-secondary transition-colors text-sm"
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-[#25D366]/15 flex items-center justify-center">
-                      <span className="text-xs font-semibold text-[#25D366]">
-                        {contact.name.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                    <span className="text-foreground font-medium">{contact.name}</span>
+        {/* Individual WhatsApp contacts */}
+        {contacts.length > 0 && settings.notify_whatsapp && (
+          <div className="w-full space-y-2">
+            {contacts.map((contact) => (
+              <button
+                key={contact.phone}
+                onClick={() => openWhatsApp(contact)}
+                className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg bg-secondary/80 hover:bg-secondary transition-colors text-sm"
+              >
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-full bg-[#25D366]/15 flex items-center justify-center">
+                    <span className="text-xs font-semibold text-[#25D366]">
+                      {contact.name.charAt(0).toUpperCase()}
+                    </span>
                   </div>
-                  {whatsappSentTo.has(contact.phone) ? (
-                    <span className="text-xs text-safe">Opened ✓</span>
-                  ) : (
-                    <Send className="w-3.5 h-3.5 text-muted-foreground" />
-                  )}
-                </button>
-              ))}
-            </div>
+                  <span className="text-foreground font-medium">{contact.name}</span>
+                </div>
+                {whatsappSentTo.has(contact.phone) ? (
+                  <span className="text-xs text-safe">Opened ✓</span>
+                ) : (
+                  <Send className="w-3.5 h-3.5 text-muted-foreground" />
+                )}
+              </button>
+            ))}
           </div>
         )}
 
