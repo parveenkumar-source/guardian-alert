@@ -1,10 +1,11 @@
 import { useState, useCallback } from "react";
-import { ShieldAlert, X, Phone, MapPin, Mic } from "lucide-react";
+import { ShieldAlert, X, Phone, MapPin, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { generateSOSMessage } from "@/lib/contacts";
+import { sendEmergencyAlert } from "@/lib/alertSender";
 import { logSOSTrigger } from "@/lib/activityLog";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "react-router-dom";
@@ -41,16 +42,15 @@ const FloatingSOSWidget = () => {
         ? generateSOSMessage(location.latitude, location.longitude, user.email?.split("@")[0])
         : `🚨 EMERGENCY SOS ALERT! I need immediate help! Location unavailable.`;
 
-      for (const contact of contacts) {
-        try {
-          await supabase.functions.invoke("send-sms", {
-            body: { to: contact.phone, message },
-          });
-        } catch {}
-      }
+      const result = await sendEmergencyAlert(contacts, message);
 
       logSOSTrigger("manual", location);
-      toast({ title: "🚨 SOS Sent!", description: "Emergency contacts alerted." });
+
+      if (result.method === "edge") {
+        toast({ title: "🚨 SOS Sent!", description: "Emergency contacts alerted via SMS." });
+      } else {
+        toast({ title: "📱 SMS App Opened", description: "Tap Send to alert contacts. Use WhatsApp too!" });
+      }
     } catch {
       toast({ title: "Failed to send SOS", variant: "destructive" });
     }
