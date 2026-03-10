@@ -47,25 +47,42 @@ Deno.serve(async (req) => {
       throw new Error("No emergency contacts found. Please add contacts first.");
     }
 
-    // Send SMS via TextBelt (free, no API key needed)
+    // Twilio credentials
+    const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
+    const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+    const fromPhone = Deno.env.get("TWILIO_PHONE_NUMBER");
+
+    if (!accountSid || !authToken || !fromPhone) {
+      throw new Error("Twilio credentials not configured");
+    }
+
+    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+    const credentials = btoa(`${accountSid}:${authToken}`);
+
+    // Send SMS to each contact via Twilio
     const results = await Promise.allSettled(
       contacts.map(async (contact) => {
-        const res = await fetch("https://textbelt.com/text", {
+        const body = new URLSearchParams({
+          To: contact.phone,
+          From: fromPhone,
+          Body: message,
+        });
+
+        const res = await fetch(twilioUrl, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            phone: contact.phone,
-            message: message,
-            key: "textbelt", // free tier key
-          }),
+          headers: {
+            "Authorization": `Basic ${credentials}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: body.toString(),
         });
 
         const data = await res.json();
-        if (!data.success) {
-          console.error(`TextBelt failed for ${contact.phone}:`, data);
-          return { contact: contact.name, phone: contact.phone, success: false, error: data.error || data.message };
+        if (!res.ok) {
+          console.error(`Twilio failed for ${contact.phone}:`, data);
+          return { contact: contact.name, phone: contact.phone, success: false, error: data.message || "Twilio error" };
         }
-        return { contact: contact.name, phone: contact.phone, success: true, textId: data.textId };
+        return { contact: contact.name, phone: contact.phone, success: true, sid: data.sid };
       })
     );
 
