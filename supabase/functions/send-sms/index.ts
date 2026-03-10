@@ -47,48 +47,31 @@ Deno.serve(async (req) => {
       throw new Error("No emergency contacts found. Please add contacts first.");
     }
 
-    // Twilio credentials
-    const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-    const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-    const fromPhone = Deno.env.get("TWILIO_PHONE_NUMBER");
-
-    if (!accountSid || !authToken || !fromPhone) {
-      throw new Error("Twilio credentials not configured");
-    }
-
-    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-    const credentials = btoa(`${accountSid}:${authToken}`);
-
-    // Send SMS to each contact via Twilio
+    // Send SMS via TextBelt (free, no API key needed)
     const results = await Promise.allSettled(
       contacts.map(async (contact) => {
-        const body = new URLSearchParams({
-          To: contact.phone,
-          From: fromPhone,
-          Body: message,
-        });
-
-        const res = await fetch(twilioUrl, {
+        const res = await fetch("https://textbelt.com/text", {
           method: "POST",
-          headers: {
-            "Authorization": `Basic ${credentials}`,
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: body.toString(),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            phone: contact.phone,
+            message: message,
+            key: "textbelt", // free tier key
+          }),
         });
 
         const data = await res.json();
-        if (!res.ok) {
-          console.error(`Failed to send SMS to ${contact.phone}:`, data);
-          return { contact: contact.name, success: false, error: data.message || "Twilio error" };
+        if (!data.success) {
+          console.error(`TextBelt failed for ${contact.phone}:`, data);
+          return { contact: contact.name, phone: contact.phone, success: false, error: data.error || data.message };
         }
-        return { contact: contact.name, success: true, sid: data.sid };
+        return { contact: contact.name, phone: contact.phone, success: true, textId: data.textId };
       })
     );
 
     const summary = results.map((r, i) => {
       const base = r.status === "fulfilled" ? r.value : { success: false, error: r.reason?.message };
-      return { ...base, contact: contacts[i].name };
+      return { ...base, contact: contacts[i].name, phone: contacts[i].phone };
     });
 
     return new Response(JSON.stringify({ success: true, results: summary }), {
