@@ -1,8 +1,10 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 
 const DISTRESS_KEYWORDS = [
-  "help", "bachao", "save me", "emergency", "sos",
+  "help", "bachao", "bachao bachao", "save me", "emergency", "sos",
   "danger", "please help", "help me", "call police",
+  "mujhe bachao", "koi bachao", "police bulao", "chhodo", "chhod do",
+  "hatao", "mat karo", "ruko", "madad", "madad karo",
 ];
 
 interface UseVoiceDetectionOptions {
