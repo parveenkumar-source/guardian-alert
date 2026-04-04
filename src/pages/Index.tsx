@@ -24,6 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import useShakeDetection from "@/hooks/useShakeDetection";
 import useVoiceDetection from "@/hooks/useVoiceDetection";
+import { triggerVoiceSOS } from "@/lib/voiceSOSAlert";
 import { logSOSTrigger, TriggerType } from "@/lib/activityLog";
 import { useSettings } from "@/hooks/useSettings";
 import { useLanguage } from "@/hooks/useLanguage";
