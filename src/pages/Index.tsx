@@ -24,6 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import useShakeDetection from "@/hooks/useShakeDetection";
 import useVoiceDetection from "@/hooks/useVoiceDetection";
+import { triggerVoiceSOS } from "@/lib/voiceSOSAlert";
 import { logSOSTrigger, TriggerType } from "@/lib/activityLog";
 import { useSettings } from "@/hooks/useSettings";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -87,7 +88,21 @@ const Index = () => {
 
   const { listening, supported: voiceSupported } = useVoiceDetection({
     enabled: settings.voice_detection,
-    onDistressDetected: () => handleSOSTrigger("voice"),
+    onDistressDetected: async () => {
+      if (!user || sosState !== "idle") return;
+      getLocation();
+      toast({
+        title: "🚨 Voice SOS Triggered!",
+        description: "Distress keyword detected — sending alerts to your emergency contacts...",
+        variant: "destructive",
+      });
+      const result = await triggerVoiceSOS(location);
+      if (result.success) {
+        toast({ title: "✅ Alerts Sent", description: "Emergency contacts have been notified with your location." });
+      } else {
+        toast({ title: "⚠️ Alert Failed", description: result.reason === "no_contacts" ? "Add emergency contacts first." : "Sign in to use voice SOS.", variant: "destructive" });
+      }
+    },
     debounceMs: 5000,
   });
 
