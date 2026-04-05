@@ -46,10 +46,10 @@ const FloatingSOSWidget = () => {
 
       logSOSTrigger("manual", location);
 
-      if (result.method === "edge") {
+      if (result.success) {
         toast({ title: "🚨 SOS Sent!", description: "Emergency contacts alerted via SMS." });
       } else {
-        toast({ title: "📱 SMS App Opened", description: "Tap Send to alert contacts. Use WhatsApp too!" });
+        toast({ title: "⚠️ SMS Failed", description: "Try WhatsApp or manual SMS.", variant: "destructive" });
       }
     } catch {
       toast({ title: "Failed to send SOS", variant: "destructive" });

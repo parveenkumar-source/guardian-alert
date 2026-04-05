@@ -87,25 +87,30 @@ const SOSConfirmed = ({ location, onDismiss, autoRecording }: SOSConfirmedProps)
       setAlertStatus("sending");
       const result = await sendEmergencyAlert(contacts, message);
       
-      if (result.method === "edge") {
+      if (result.success) {
         const successCount = result.edgeResult?.results?.filter((r: any) => r.success).length || 0;
         setAlertStatus("sent");
         setAlertMethod("SMS");
         toast({
           title: "✅ SMS Alert Sent!",
-          description: `${successCount} contact${successCount !== 1 ? "s" : ""} notified.`,
+          description: `${successCount} contact${successCount !== 1 ? "s" : ""} notified automatically.`,
         });
       } else {
-        // Native SMS fallback was triggered
-        setAlertStatus("fallback");
-        setAlertMethod("Native SMS");
+        setAlertStatus("failed");
+        setAlertMethod("SMS");
         toast({
-          title: "📱 SMS App Opened",
-          description: "Tap Send in your SMS app to alert contacts. Also use WhatsApp below.",
+          title: "⚠️ SMS Failed",
+          description: "Automatic SMS failed. Use WhatsApp or manual SMS below.",
+          variant: "destructive",
         });
       }
     };
     doAlert();
+
+    // Auto-send WhatsApp if enabled
+    if (settings.notify_whatsapp) {
+      sendAllWhatsApp(contacts, message);
+    }
 
     // Also send push notification
     if (pushSubscribed) {
@@ -164,8 +169,8 @@ const SOSConfirmed = ({ location, onDismiss, autoRecording }: SOSConfirmedProps)
           {alertStatus === "sent" && (
             <p className="text-xs text-safe">✅ {alertMethod} delivered successfully</p>
           )}
-          {alertStatus === "fallback" && (
-            <p className="text-xs text-amber-500">📱 SMS app opened — tap Send to deliver</p>
+          {alertStatus === "failed" && (
+            <p className="text-xs text-destructive">⚠️ Auto SMS failed — use WhatsApp or manual SMS below</p>
           )}
         </div>
 
