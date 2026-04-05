@@ -169,8 +169,8 @@ const SOSConfirmed = ({ location, onDismiss, autoRecording }: SOSConfirmedProps)
           {alertStatus === "sent" && (
             <p className="text-xs text-safe">✅ {alertMethod} delivered successfully</p>
           )}
-          {alertStatus === "fallback" && (
-            <p className="text-xs text-amber-500">📱 SMS app opened — tap Send to deliver</p>
+          {alertStatus === "failed" && (
+            <p className="text-xs text-destructive">⚠️ Auto SMS failed — use WhatsApp or manual SMS below</p>
           )}
         </div>
 
