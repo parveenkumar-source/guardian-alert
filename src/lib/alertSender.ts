@@ -6,20 +6,6 @@ interface Contact {
 }
 
 /**
- * Opens the native SMS app with pre-filled message for all contacts.
- * Works on mobile — user's own SMS plan is used, so it's 100% free.
- */
-export const sendViaNativeSMS = (contacts: Contact[], message: string) => {
-  // Build comma-separated phone list for sms: URI
-  const phones = contacts.map((c) => c.phone).join(",");
-  const encoded = encodeURIComponent(message);
-  // iOS uses &body=, Android uses ?body= — using ? works on both for single recipient
-  // For multiple, most platforms support comma-separated
-  const smsUri = `sms:${phones}?body=${encoded}`;
-  window.open(smsUri, "_self");
-};
-
-/**
  * Opens WhatsApp with pre-filled message for a single contact.
  */
 export const sendViaWhatsApp = (phone: string, message: string) => {
@@ -38,8 +24,8 @@ export const sendAllWhatsApp = (contacts: Contact[], message: string) => {
 };
 
 /**
- * Tries to send alerts through the edge function (TextBelt).
- * Returns results array. If it fails, returns null so caller can use fallback.
+ * Sends SMS via Twilio edge function automatically (no app opening).
+ * Returns results array or null on failure.
  */
 export const sendViaEdgeFunction = async (message: string) => {
   try {
@@ -55,27 +41,30 @@ export const sendViaEdgeFunction = async (message: string) => {
 };
 
 /**
- * Master alert function — tries edge function first, then opens native SMS as fallback.
+ * Opens native SMS app as a manual fallback (user must tap Send).
+ * Only used when user explicitly clicks the button.
+ */
+export const sendViaNativeSMS = (contacts: Contact[], message: string) => {
+  const phones = contacts.map((c) => c.phone).join(",");
+  const encoded = encodeURIComponent(message);
+  const smsUri = `sms:${phones}?body=${encoded}`;
+  window.open(smsUri, "_self");
+};
+
+/**
+ * Master alert function — sends SMS automatically via Twilio.
+ * No native app opening — fully automatic.
  */
 export const sendEmergencyAlert = async (
   contacts: Contact[],
-  message: string,
-  options?: { skipEdgeFunction?: boolean }
-): Promise<{ method: "edge" | "native_sms" | "both"; edgeResult?: any }> => {
-  if (options?.skipEdgeFunction) {
-    sendViaNativeSMS(contacts, message);
-    return { method: "native_sms" };
-  }
-
-  // Try edge function first
+  message: string
+): Promise<{ method: "twilio" | "failed"; success: boolean; edgeResult?: any }> => {
   const edgeResult = await sendViaEdgeFunction(message);
-  const edgeSuccess = edgeResult?.results?.some((r: any) => r.success);
+  const successCount = edgeResult?.results?.filter((r: any) => r.success).length || 0;
 
-  if (edgeSuccess) {
-    return { method: "edge", edgeResult };
+  if (successCount > 0) {
+    return { method: "twilio", success: true, edgeResult };
   }
 
-  // Edge function failed — fallback to native SMS
-  sendViaNativeSMS(contacts, message);
-  return { method: "both", edgeResult };
+  return { method: "failed", success: false, edgeResult };
 };
