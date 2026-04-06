@@ -63,8 +63,8 @@ const SOSConfirmed = ({ location, onDismiss, autoRecording }: SOSConfirmedProps)
   }, [autoRecording, user]);
 
   const baseMessage = location
-    ? generateSOSMessage(location.latitude, location.longitude)
-    : "🚨 EMERGENCY SOS ALERT! I need immediate help!";
+    ? generateSOSMessage(location.latitude, location.longitude, user?.user_metadata?.display_name)
+    : `🚨 *EMERGENCY SOS ALERT!*\n\n⚠️ I am in danger and need immediate help!\n📍 Location unavailable\n🕐 Time: ${new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" })}\n\nPlease call me or send help immediately.\nThis is an automated alert from Raksha Safety App.`;
 
   const message = settings.custom_message
     ? `${baseMessage}\n\n${settings.custom_message}`
