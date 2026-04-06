@@ -26,7 +26,7 @@ export async function triggerVoiceSOS(
   // Build message with location
   const message = location
     ? generateSOSMessage(location.latitude, location.longitude)
-    : `🚨 EMERGENCY SOS ALERT!\nI need immediate help! (Location unavailable)\nTriggered via voice command.\nTimestamp: ${new Date().toLocaleString()}`;
+    : `🚨 *EMERGENCY SOS ALERT!*\n\n⚠️ I am in danger and need immediate help!\n📍 Location unavailable\n🕐 Time: ${new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" })}\n\nTriggered via voice command.\nPlease call me or send help immediately.\nThis is an automated alert from Raksha Safety App.`;
 
   // Log activity
   logSOSTrigger("voice", location);
